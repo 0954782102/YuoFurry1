@@ -27,6 +27,7 @@
         
         .video-card {
             transition: transform 0.2s ease;
+            cursor: pointer;
         }
         
         .video-card:hover {
@@ -74,16 +75,6 @@
             .mobile-search {
                 display: block;
             }
-        }
-        
-        /* Performance optimizations */
-        .lazy-load {
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .lazy-load.loaded {
-            opacity: 1;
         }
         
         .mobile-search {
@@ -251,7 +242,7 @@
             </div>
 
             <!-- Categories -->
-            <div class="flex space-x-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+            <div class="flex space-x-2 mb-6 overflow-x-auto pb-2">
                 <button class="category-btn active bg-[#272727] text-white px-3 py-1 rounded-full whitespace-nowrap hover:bg-[#3a3a3a] transition-colors" data-category="all">
                     Усі
                 </button>
@@ -304,7 +295,10 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing YutFurry...');
             setupEventListeners();
+            // Load initial videos
+            loadVideos('all');
         });
 
         function setupEventListeners() {
@@ -335,13 +329,16 @@
                 }
             });
 
-            // Category buttons
+            // Category buttons - FIXED: Proper event delegation
             categoryBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
                     console.log('Category clicked:', this.getAttribute('data-category'));
                     const category = this.getAttribute('data-category');
+                    
+                    // Update active state
                     categoryBtns.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
+                    
                     currentCategory = category;
                     loadVideos(category);
                 });
@@ -371,6 +368,15 @@
                         break;
                     case 'popular':
                         searchQuery = 'популярні відео україна';
+                        break;
+                    case 'movies':
+                        searchQuery = 'фільми україна';
+                        break;
+                    case 'live':
+                        searchQuery = 'живі трансляції україна';
+                        break;
+                    case 'learning':
+                        searchQuery = 'навчання програмування';
                         break;
                     default:
                         searchQuery = 'україна';
@@ -447,14 +453,14 @@
                 const thumbnail = video.snippet.thumbnails.medium ? video.snippet.thumbnails.medium.url : 'https://via.placeholder.com/320x180';
                 const title = video.snippet.title || 'Без назви';
                 const channel = video.snippet.channelTitle || 'Невідомий канал';
+                const videoId = video.id.videoId;
                 
                 return `
-                <div class="video-card bg-transparent rounded-lg overflow-hidden cursor-pointer">
+                <div class="video-card bg-transparent rounded-lg overflow-hidden" onclick="openVideo('${videoId}')">
                     <div class="relative">
                         <img src="${thumbnail}" 
                              alt="${title}" 
-                             class="w-full h-40 object-cover rounded-xl lazy-load"
-                             onload="this.classList.add('loaded')">
+                             class="w-full h-40 object-cover rounded-xl">
                         <span class="absolute bottom-2 right-2 bg-black bg-opacity-80 text-xs px-1 rounded">10:25</span>
                     </div>
                     <div class="flex mt-3">
@@ -468,6 +474,11 @@
                 </div>
                 `;
             }).join('');
+        }
+
+        // Function to open video in new tab
+        function openVideo(videoId) {
+            window.open(`https://www.youtube.com/watch?v=${videoId}`, '_blank');
         }
 
         // Test function to check if API key works
@@ -489,17 +500,9 @@
             }
         }
 
-        // Initialize and test API on load
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Initializing YutFurry...');
-            testAPI().then(success => {
-                if (success) {
-                    console.log('Система готова до роботи');
-                } else {
-                    alert('Увага: Проблема з API ключем. Перевірте консоль для деталей.');
-                }
-            });
-        });
+        // Make functions globally available
+        window.openVideo = openVideo;
+        window.performSearch = performSearch;
     </script>
 </body>
 </html>
