@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>YouFurry — відеоплатформа</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">
+      <div class="logo-icon">▶</div>
+      <div class="logo-text">YouFurry</div>
+    </div>
+    <div class="search-area">
+      <input id="searchInput" type="search" placeholder="Пошук відео..." />
+      <button id="searchBtn">Шукати</button>
+    </div>
+    <div class="actions">
+      <button id="uploadBtn">Завантажити</button>
+      <button id="profileBtn">Профіль</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <nav class="sidebar">
+      <button class="nav-item active" data-section="home">Головна</button>
+      <button class="nav-item" data-section="subscriptions">Підписки</button>
+      <button class="nav-item" data-section="trending">Тренди</button>
+      <button class="nav-item" data-section="library">Бібліотека</button>
+      <button class="nav-item" data-section="favorites">Улюблені</button>
+    </nav>
+
+    <main class="content">
+      <section class="grid-controls">
+        <h1>YouFurry</h1>
+        <div class="filter">
+          <select id="sortSelect">
+            <option value="relevance">За релевантністю</option>
+            <option value="new">Нові</option>
+            <option value="popular">Популярні</option>
+          </select>
+        </div>
+      </section>
+
+      <section id="videosGrid" class="videos-grid" aria-live="polite">
+        <!-- Відеокартки генеруються скриптом -->
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal для відтворення -->
+  <div id="playerModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <button id="closeModal" class="close-btn">✕</button>
+      <div id="playerArea">
+        <!-- Тег iframe або відео -->
+      </div>
+      <div id="videoMeta"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
