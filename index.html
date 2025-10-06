@@ -1,265 +1,309 @@
-<!doctype html>  
-<html lang="uk">  
-<head>  
-  <meta charset="utf-8" />  
-  <meta name="viewport" content="width=device-width,initial-scale=1" />  
-  <title>YouFurry — відеоплатформа (One-file)</title>  
-  <style>  
-    :root{  
-      --bg: #fff;  
-      --accent: #ff3b3b;  
-      --muted: #6b7280;  
-      --card: #f7f7fa;  
-      --rounded: 12px;  
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;  
-    }  
-    *{box-sizing:border-box}  
-    body{margin:0;background:linear-gradient(90deg,#fff 0%,#fff0 100%);color:#111}  
-    .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #eee;background:rgba(255,255,255,0.8);position:sticky;top:0;backdrop-filter: blur(4px);z-index:10}  
-    .logo{display:flex;align-items:center;gap:10px}  
-    .logo-icon{width:42px;height:42px;background:var(--accent);color:white;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700}  
-    .logo-text{font-size:20px;font-weight:700;color:var(--accent)}  
-    .search-area{flex:1;display:flex;justify-content:center;gap:8px}  
-    .search-area input{width:60%;max-width:680px;padding:10px 12px;border-radius:24px;border:1px solid #e5e7eb}  
-    .search-area button{padding:10px 14px;border-radius:20px;background:var(--accent);color:#fff;border:0;cursor:pointer}  
-    .actions button{margin-left:8px;padding:8px 12px;border-radius:10px;border:1px solid #eee;background:#fff;cursor:pointer}  
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YutFurry - YouTube клієнт</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .video-thumbnail {
+            transition: transform 0.2s ease;
+        }
+        .video-thumbnail:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-black border-b border-gray-800">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">YF</span>
+                    </div>
+                    <span class="text-xl font-bold">YutFurry</span>
+                </div>
 
-    /* layout */  
-    .container{display:flex;gap:20px;padding:20px}  
-    .sidebar{width:200px}  
-    .nav-item{display:block;width:100%;padding:10px 12px;border-radius:10px;border:0;background:transparent;text-align:left;color:var(--muted);margin-bottom:6px;cursor:pointer}  
-    .nav-item.active{background:#fff;color:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,0.04)}  
+                <!-- Search Bar -->
+                <form id="searchForm" class="flex-1 max-w-2xl mx-8">
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="searchInput"
+                            placeholder="Шукати відео..." 
+                            class="w-full bg-gray-900 border border-gray-700 text-white pl-10 pr-4 py-2 rounded-full focus:outline-none focus:border-red-600"
+                        />
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </form>
 
-    .content{flex:1}  
-    .grid-controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}  
-    .videos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}  
+                <!-- User Actions -->
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 border border-gray-700 rounded-full bg-transparent hover:bg-gray-800 transition">
+                        <div class="w-6 h-6">🌓</div>
+                    </button>
+                    <button class="p-2 border border-gray-700 rounded-full bg-transparent hover:bg-gray-800 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
 
-    /* card */  
-    .card{background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 2px 6px rgba(16,24,40,0.04);cursor:pointer;display:flex;flex-direction:column}  
-    .thumb{height:130px;background:#ddd;display:flex;align-items:center;justify-content:center;position:relative}  
-    .thumb img{width:100%;height:100%;object-fit:cover;display:block}  
-    .play-btn{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px}  
-    .card-body{padding:10px}  
-    .title{font-weight:600;font-size:14px;margin-bottom:6px}  
-    .meta{font-size:12px;color:var(--muted)}  
+    <div class="container mx-auto px-4 py-6">
+        <div class="flex gap-8">
+            <!-- Sidebar -->
+            <aside class="w-64 flex-shrink-0">
+                <nav class="space-y-2">
+                    <button data-category="all" class="category-btn w-full text-left px-4 py-2 rounded-lg hover:bg-gray-800 transition bg-gray-800 text-white">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                            </svg>
+                            Усі
+                        </div>
+                    </button>
+                    <button data-category="popular" class="category-btn w-full text-left px-4 py-2 rounded-lg hover:bg-gray-800 transition text-gray-300">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
+                            </svg>
+                            Популярне
+                        </div>
+                    </button>
+                    <button data-category="music" class="category-btn w-full text-left px-4 py-2 rounded-lg hover:bg-gray-800 transition text-gray-300">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+                            </svg>
+                            Музика
+                        </div>
+                    </button>
+                    <button data-category="gaming" class="category-btn w-full text-left px-4 py-2 rounded-lg hover:bg-gray-800 transition text-gray-300">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Ігри
+                        </div>
+                    </button>
+                </nav>
+            </aside>
 
-    /* modal */  
-    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center}  
-    .modal.hidden{display:none}  
-    .modal-content{background:#fff;padding:12px;border-radius:12px;width:min(900px,95%);max-height:90vh;overflow:auto;position:relative}  
-    .close-btn{position:absolute;right:10px;top:8px;border:0;background:transparent;font-size:20px;cursor:pointer}  
-    #playerArea iframe, #playerArea video{width:100%;height:480px;border-radius:8px;background:#000}  
-    @media(max-width:800px){  
-      .sidebar{display:none}  
-      .search-area input{width:70%}  
-      #playerArea iframe, #playerArea video{height:260px}  
-    }  
+            <!-- Main Content -->
+            <main class="flex-1">
+                <!-- Video Player -->
+                <div id="videoPlayerContainer" class="mb-8 hidden">
+                    <div class="aspect-video bg-black rounded-lg overflow-hidden">
+                        <iframe 
+                            id="youtubePlayer"
+                            class="w-full h-full"
+                            src=""
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="mt-4">
+                        <h2 id="videoTitle" class="text-2xl font-bold"></h2>
+                        <p id="videoChannel" class="text-gray-400 mt-2"></p>
+                        <p id="videoDescription" class="text-gray-300 mt-4"></p>
+                    </div>
+                </div>
 
-    /* small helpers */  
-    .small-muted{color:var(--muted);font-size:12px}  
-    .top-controls{display:flex;gap:8px;align-items:center}  
-  </style>  
-</head>  
-<body>  
-  <header class="topbar">  
-    <div class="logo">  
-      <div class="logo-icon">▶</div>  
-      <div class="logo-text">YouFurry</div>  
-    </div>  
-    <div class="search-area">  
-      <input id="searchInput" type="search" placeholder="Пошук відео..." />  
-      <button id="searchBtn">Шукати</button>  
-    </div>  
-    <div class="actions">  
-      <button id="uploadBtn">Завантажити</button>  
-      <button id="profileBtn">Профіль</button>  
-    </div>  
-  </header>  
+                <!-- Video Grid -->
+                <div>
+                    <h2 id="resultsTitle" class="text-2xl font-bold mb-6">Популярні відео</h2>
+                    
+                    <div id="loadingIndicator" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            <div class="animate-pulse">
+                                <div class="bg-gray-800 rounded-lg aspect-video mb-2"></div>
+                                <div class="bg-gray-800 h-4 rounded mb-2"></div>
+                                <div class="bg-gray-800 h-3 rounded w-3/4"></div>
+                            </div>
+                        </div>
+                    </div>
 
-  <div class="container">  
-    <nav class="sidebar">  
-      <button class="nav-item active" data-section="home">Головна</button>  
-      <button class="nav-item" data-section="subscriptions">Підписки</button>  
-      <button class="nav-item" data-section="trending">Тренди</button>  
-      <button class="nav-item" data-section="library">Бібліотека</button>  
-      <button class="nav-item" data-section="favorites">Улюблені</button>  
-    </nav>  
+                    <div id="videoGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Videos will be loaded here -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
 
-    <main class="content">  
-      <section class="grid-controls">  
-        <h1>YouFurry</h1>  
-        <div class="top-controls">  
-          <select id="sortSelect">  
-            <option value="relevance">За релевантністю</option>  
-            <option value="new">Нові</option>  
-            <option value="popular">Популярні</option>  
-          </select>  
-          <label class="small-muted" style="margin-left:8px">  
-            Режим:  
-            <select id="modeSelect" title="Виберіть режим відтворення">  
-              <option value="local">Локальні демо-відео</option>  
-              <option value="youtube">YouTube API (потрібен ключ)</option>  
-            </select>  
-          </label>  
-        </div>  
-      </section>  
+    <script>
+        const API_KEY = 'AIzaSyBVqXcayVNDN63l4WpH2HOrTfAqzh3DTXo';
+        let currentVideos = [];
+        let activeCategory = 'all';
 
-      <section id="videosGrid" class="videos-grid" aria-live="polite">  
-        <!-- Відеокартки генеруються скриптом -->  
-      </section>  
-    </main>  
-  </div>  
+        // DOM Elements
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const videoGrid = document.getElementById('videoGrid');
+        const videoPlayerContainer = document.getElementById('videoPlayerContainer');
+        const youtubePlayer = document.getElementById('youtubePlayer');
+        const videoTitle = document.getElementById('videoTitle');
+        const videoChannel = document.getElementById('videoChannel');
+        const videoDescription = document.getElementById('videoDescription');
+        const resultsTitle = document.getElementById('resultsTitle');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const categoryButtons = document.querySelectorAll('.category-btn');
 
-  <!-- Modal для відтворення -->  
-  <div id="playerModal" class="modal hidden" role="dialog" aria-modal="true">  
-    <div class="modal-content">  
-      <button id="closeModal" class="close-btn" title="Закрити">✕</button>  
-      <div id="playerArea">  
-        <!-- Тег iframe або відео -->  
-      </div>  
-      <div id="videoMeta"></div>  
-    </div>  
-  </div>  
+        // Event Listeners
+        searchForm.addEventListener('submit', handleSearch);
+        categoryButtons.forEach(btn => {
+            btn.addEventListener('click', handleCategorySelect);
+        });
 
-  <script>  
-    /****************************************************************  
-     * YouFurry — One-file demo  
-     * Вставте свій YouTube API ключ нижче в змінну YOUTUBE_API_KEY,  
-     * якщо хочете використовувати режим "YouTube API".  
-     *  
-     * WARNING: НЕ РЕКОМЕНДУЮ розміщувати реальний ключ у клієнтському  
-     * коді, якщо файл може стати доступним іншим.  
-     ****************************************************************/  
+        // Load popular videos on startup
+        document.addEventListener('DOMContentLoaded', loadPopularVideos);
 
-    // ----------------- demo data (локальні заглушки) -----------------  
-    const demoVideos = [  
-      {  
-        id: 'yf1',  
-        title: 'Furry Adventures — Episode 1',  
-        thumb: 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="#cfe9f9"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="30" fill="#334155">Furry 1</text></svg>`),  
-        channel: 'YouFurry Studio',  
-        views: '1200000',  
-        duration: '4:12',  
-        // локальний або зовнішній mp4 (якщо хочете, поміняйте на свої)  
-        src: '' // порожній за замовчуванням  
-      },  
-      {  
-        id: 'yf2',  
-        title: 'Corgi Tips & Tricks',  
-        thumb: 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="#ffdbe6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="30" fill="#7f1d1d">Corgi</text></svg>`),  
-        channel: 'FurTube',  
-        views: '842000',  
-        duration: '6:05',  
-        src: ''  
-      },  
-      {  
-        id: 'yf3',  
-        title: 'Meet the Foxes',  
-        thumb: 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="#efe9ff"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="30" fill="#4c1d95">Foxes</text></svg>`),  
-        channel: 'AnimAll',  
-        views: '420000',  
-        duration: '3:33',  
-        src: ''  
-      },  
-      {  
-        id: 'yf4',  
-        title: 'Cute Cats Compilation',  
-        thumb: 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360"><rect width="100%" height="100%" fill="#fff1c9"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="30" fill="#7c3aed">Cats</text></svg>`),  
-        channel: 'YouFurry Studio',  
-        views: '2300000',  
-        duration: '10:11',  
-        src: ''  
-      }  
-    ];  
+        async function handleSearch(e) {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            if (!query) return;
+            
+            await searchVideos(query, activeCategory);
+        }
 
-    // ----------------- Config / API key -----------------  
-    // ВАЖЛИВО: якщо ви вставляєте реальний ключ, робіть це на свій ризик.  
-    // Замість цього рекомендую використовувати бекенд-проксі.  
-    const YOUTUBE_API_KEY = 'AIzaSyBVqXcayVNDN63l4WpH2HOrTfAqzh3DTXo'; // <- Вставте свій ключ сюди (як просили)  
-    // Якщо не хочете використовувати ключ — встановіть порожній рядок:  
-    // const YOUTUBE_API_KEY = '';  
+        function handleCategorySelect(e) {
+            // Update active button styles
+            categoryButtons.forEach(btn => {
+                btn.classList.remove('bg-gray-800', 'text-white');
+                btn.classList.add('text-gray-300');
+            });
+            
+            e.currentTarget.classList.add('bg-gray-800', 'text-white');
+            e.currentTarget.classList.remove('text-gray-300');
+            
+            activeCategory = e.currentTarget.dataset.category;
+            
+            if (searchInput.value.trim()) {
+                searchVideos(searchInput.value.trim(), activeCategory);
+            } else {
+                loadPopularVideos();
+            }
+        }
 
-    // ----------------- DOM references -----------------  
-    const videosGrid = document.getElementById('videosGrid');  
-    const searchInput = document.getElementById('searchInput');  
-    const searchBtn = document.getElementById('searchBtn');  
-    const sortSelect = document.getElementById('sortSelect');  
-    const playerModal = document.getElementById('playerModal');  
-    const playerArea = document.getElementById('playerArea');  
-    const videoMeta = document.getElementById('videoMeta');  
-    const closeModal = document.getElementById('closeModal');  
-    const modeSelect = document.getElementById('modeSelect');  
+        async function searchVideos(query, category = 'all') {
+            showLoading();
+            
+            try {
+                let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=${encodeURIComponent(query)}&key=${API_KEY}`;
+                
+                if (category !== 'all') {
+                    const categoryId = getCategoryId(category);
+                    if (categoryId) {
+                        url += `&videoCategoryId=${categoryId}`;
+                    }
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                currentVideos = data.items || [];
+                displayVideos(currentVideos);
+                resultsTitle.textContent = `Результати пошуку: "${query}"`;
+                
+            } catch (error) {
+                console.error('Помилка пошуку:', error);
+                videoGrid.innerHTML = '<p class="text-red-400">Помилка завантаження відео</p>';
+            } finally {
+                hideLoading();
+            }
+        }
 
-    // ----------------- Helpers -----------------  
-    function numberWithCommas(x){  
-      if(!x) return '0';  
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");  
-    }  
+        async function loadPopularVideos() {
+            showLoading();
+            
+            try {
+                const response = await fetch(
+                    `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&maxResults=20&key=${API_KEY}`
+                );
+                const data = await response.json();
+                
+                // Convert to compatible format
+                currentVideos = data.items.map(item => ({
+                    id: { videoId: item.id },
+                    snippet: item.snippet
+                }));
+                
+                displayVideos(currentVideos);
+                resultsTitle.textContent = 'Популярні відео';
+                
+            } catch (error) {
+                console.error('Помилка завантаження популярних відео:', error);
+                videoGrid.innerHTML = '<p class="text-red-400">Помилка завантаження відео</p>';
+            } finally {
+                hideLoading();
+            }
+        }
 
-    function renderCards(list){  
-      videosGrid.innerHTML = '';  
-      list.forEach(v=>{  
-        const card = document.createElement('article');  
-        card.className = 'card';  
-        card.innerHTML = `  
-          <div class="thumb" data-id="${v.id}">  
-            <img src="${v.thumb}" alt="${escapeHtml(v.title)}" />  
-            <div class="play-btn" aria-hidden="true">▶</div>  
-          </div>  
-          <div class="card-body">  
-            <div class="title">${escapeHtml(v.title)}</div>  
-            <div class="meta">${escapeHtml(v.channel)} • ${numberWithCommas(v.views)} views</div>  
-          </div>  
-        `;  
-        // Клік по обкладинці відкриває модал  
-        card.querySelector('.thumb').addEventListener('click', () => openPlayer(v));  
-        videosGrid.appendChild(card);  
-      });  
-    }  
+        function displayVideos(videos) {
+            if (videos.length === 0) {
+                videoGrid.innerHTML = '<p class="text-gray-400">Відео не знайдено</p>';
+                return;
+            }
 
-    // Простий захист від XSS в даних  
-    function escapeHtml(str){  
-      if(!str) return '';  
-      return String(str).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]); });  
-    }  
+            videoGrid.innerHTML = videos.map(video => `
+                <div class="video-thumbnail cursor-pointer" onclick="playVideo('${video.id.videoId}', '${video.snippet.title.replace(/'/g, "\\'")}', '${video.snippet.channelTitle.replace(/'/g, "\\'")}', '${video.snippet.description.replace(/'/g, "\\'")}')">
+                    <div class="bg-gray-800 rounded-lg aspect-video mb-2 overflow-hidden">
+                        <img 
+                            src="${video.snippet.thumbnails.medium.url}" 
+                            alt="${video.snippet.title}"
+                            class="w-full h-full object-cover"
+                        >
+                    </div>
+                    <h3 class="font-semibold line-clamp-2">${video.snippet.title}</h3>
+                    <p class="text-gray-400 text-sm mt-1">${video.snippet.channelTitle}</p>
+                    <p class="text-gray-500 text-xs mt-1">${new Date(video.snippet.publishedAt).toLocaleDateString('uk-UA')}</p>
+                </div>
+            `).join('');
+        }
 
-    // ----------------- Player -----------------  
-    function openPlayer(video){  
-      playerArea.innerHTML = '';  
-      videoMeta.innerHTML = '';  
-      const mode = modeSelect.value;  
+        function playVideo(videoId, title, channel, description) {
+            youtubePlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            videoTitle.textContent = title;
+            videoChannel.textContent = channel;
+            videoDescription.textContent = description;
+            videoPlayerContainer.classList.remove('hidden');
+            
+            // Scroll to player
+            videoPlayerContainer.scrollIntoView({ behavior: 'smooth' });
+        }
 
-      if(mode === 'local'){  
-        // Локальний режим: якщо є src -> використовуємо <video>, інакше — покажемо повідомлення  
-        if(video.src){  
-          const videoEl = document.createElement('video');  
-          videoEl.controls = true;  
-          videoEl.src = video.src;  
-          videoEl.autoplay = true;  
-          playerArea.appendChild(videoEl);  
-        } else {  
-          // Нема локального файлу — покажемо великий плакат і короткий опис  
-          const poster = document.createElement('div');  
-          poster.style.background = '#000';  
-          poster.style.color = '#fff';  
-          poster.style.padding = '40px';  
-          poster.style.textAlign = 'center';  
-          poster.innerHTML = `<h2 style="margin:0 0 8px">${escapeHtml(video.title)}</h2><p style="margin:0 0 12px">Локальний файл не заданий. Ви можете додати шлях до mp4 в demoVideos[].src</p><button id="embedYoutubeBtn">Відтворити на YouTube (ембед)</button>`;  
-          playerArea.appendChild(poster);  
+        function getCategoryId(category) {
+            const categoryMap = {
+                music: '10',
+                gaming: '20',
+                popular: ''
+            };
+            return categoryMap[category] || '';
+        }
 
-          document.getElementById('embedYoutubeBtn').addEventListener('click', ()=>{  
-            // Якщо відео має поле youtubeId, можна відтворити ембед  
-            if(video.youtubeId) {  
-              loadYouTubeEmbed(video.youtubeId);  
-            } else {  
-              alert('Немає YouTube ID для цього відео.');  
-            }  
-          });  
-        }  
-      } else if(mode === 'youtube'){  
-        // YouTube режим — якщо в об'єкті є youtubeId, відтворюємо його.  
-        // Якщо немає — робимо запит пошуку по title (потребує ключ)  
-        if(!YOUTUBE_API_KEY){  
-          playerArea.innerHTML = '<div style="padding:20px;color:#111">YouTube API key не заданий. Встановіть YOUTUBE_API_KEY у коді.</div>';  
-        } else if(video.youtubeId){  
-          load
+        function showLoading() {
+            loadingIndicator.classList.remove('hidden');
+            videoGrid.classList.add('hidden');
+        }
+
+        function hideLoading() {
+            loadingIndicator.classList.add('hidden');
+            videoGrid.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
