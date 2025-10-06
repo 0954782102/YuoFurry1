@@ -478,7 +478,7 @@
 
             <!-- Video Grid -->
             <div class="video-grid" id="videoGrid">
-                <div class="loading">Оберіть категорію або введіть пошуковий запит</div>
+                <div class="loading">Завантаження популярних відео...</div>
             </div>
         </div>
 
@@ -520,7 +520,7 @@
                     channelTitle: 'Rick Astley',
                     publishedAt: '2009-10-25T06:57:33Z',
                     thumbnails: {
-                        medium: { url: 'https://pub-cdn.sider.ai/u/U03VH8GJY6V/web-coder/68e36c96b54d8be52ab278e4/resource/3f372a14-c3d4-4bbf-88d0-22038e549180.jpg' }
+                        medium: { url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg' }
                     }
                 },
                 statistics: {
@@ -536,7 +536,7 @@
                     channelTitle: 'Luis Fonsi',
                     publishedAt: '2017-01-13T04:59:31Z',
                     thumbnails: {
-                        medium: { url: 'https://pub-cdn.sider.ai/u/U03VH8GJY6V/web-coder/68e36c96b54d8be52ab278e4/resource/a2ba17ae-3108-43a1-862e-7ffbb2940ed5.jpg' }
+                        medium: { url: 'https://img.youtube.com/vi/kJQP7kiw5Fk/mqdefault.jpg' }
                     }
                 },
                 statistics: {
@@ -552,7 +552,7 @@
                     channelTitle: 'officialpsy',
                     publishedAt: '2012-07-15T07:46:32Z',
                     thumbnails: {
-                        medium: { url: 'https://pub-cdn.sider.ai/u/U03VH8GJY6V/web-coder/68e36c96b54d8be52ab278e4/resource/25e5e7f2-f000-41df-96a8-1566e6cef406.jpg' }
+                        medium: { url: 'https://img.youtube.com/vi/9bZkp7q19f0/mqdefault.jpg' }
                     }
                 },
                 statistics: {
@@ -665,7 +665,13 @@
         }
 
         // Handle category clicks
+        function handleCategoryClick(category) {
             videoGrid.innerHTML = '<div class="loading">Завантаження...</div>';
+            
+            if (category === 'Популярне') {
+                loadPopularVideos();
+                return;
+            }
             
             // Simulate loading delay
             setTimeout(() => {
@@ -694,14 +700,14 @@
             videoGrid.innerHTML = videos.map(video => `
                 <div class="video-card" onclick="openVideoPlayer('${video.id.videoId}')">
                     <div class="thumbnail">
-                        <img src="${video.snippet.thumbnails.medium.url}" alt="${video.snippet.title}">
+                        <img src="${video.snippet.thumbnails.medium.url}" alt="${video.snippet.title}" onerror="this.src='https://via.placeholder.com/320x180/333333/ffffff?text=Thumbnail'">
                         <div class="duration">5:30</div>
                     </div>
                     <div class="video-info">
                         <div class="video-title">${video.snippet.title}</div>
                         <div class="channel-info">
                             <div class="channel-avatar">
-                                <img src="https://pub-cdn.sider.ai/u/U03VH8GJY6V/web-coder/68e36c96b54d8be52ab278e4/resource/9772c0a6-eea2-4fb0-ab51-36ddb2aef96c.jpg" alt="${video.snippet.channelTitle}">
+                                <img src="https://via.placeholder.com/36/373737/ffffff?text=${video.snippet.channelTitle.charAt(0)}" alt="${video.snippet.channelTitle}">
                             </div>
                             <div class="channel-name">${video.snippet.channelTitle}</div>
                         </div>
