@@ -659,10 +659,22 @@
                     </div>
                 </div>
             `).join('');
+
+            // Add click event listeners to prevent any anchor behavior
+            document.querySelectorAll('.video-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            });
         }
 
         // Open video player with embedded YouTube iframe
         function openVideoPlayer(videoId) {
+            // Prevent any default behavior that might cause redirect
+            event.preventDefault();
+            event.stopPropagation();
+            
             // Clear previous content
             videoPlayer.innerHTML = '';
             playerInfo.innerHTML = '';
@@ -671,11 +683,14 @@
             const video = currentVideos.find(v => v.id.videoId === videoId);
             if (!video) return;
 
-            // Create iframe for embedded YouTube player
+            // Create iframe for embedded YouTube player with proper settings
             const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
             iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
             iframe.allowFullscreen = true;
+            iframe.setAttribute('frameborder', '0');
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
             videoPlayer.appendChild(iframe);
 
             // Create player info
@@ -697,7 +712,7 @@
                 </div>
             `;
 
-            // Show modal
+            // Show modal and prevent body scroll
             videoModal.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
