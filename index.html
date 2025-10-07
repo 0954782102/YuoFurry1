@@ -1,120 +1,75 @@
 <!doctype html>
 <html lang="uk">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>YouFurry — відео для душі</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>YouFurry — мобільна версія</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23ff6b6b'/%3E%3Ctext x='50' y='57' font-size='36' text-anchor='middle' fill='white' font-family='Arial'%3EYF%3C/text%3E%3C/svg%3E">
 <style>
-  /* --- Reset + base --- */
   :root{
-    --bg:#0f0f11; --card:#141416; --muted:#9aa0a6; --accent:#ff5252; --glass: rgba(255,255,255,0.03);
-    --radius:14px; --container-w:1100px;
+    --bg:#050507; --card:#0f1113; --muted:#9aa0a6; --accent:#ff5252; --glass: rgba(255,255,255,0.03);
+    --radius:14px;
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;
-    font-family:Inter, Roboto, Arial, sans-serif;
-    background: linear-gradient(180deg,#07070a 0%, #0e0e11 100%);
-    color:#e6eef3;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    display:flex;flex-direction:column;align-items:center;
-  }
-  .app{
-    width:100%; max-width:var(--container-w); padding:18px; display:flex; flex-direction:column; gap:18px;
-  }
+  html,body{height:100%; margin:0; font-family:Inter, Roboto, Arial, sans-serif; background:linear-gradient(180deg,#030305,#09090b); color:#e9f3f8}
+  a{color:inherit}
+  /* App container */
+  .app{max-width:1100px; margin:0 auto; padding:14px; display:flex; flex-direction:column; gap:12px;}
+  header{display:flex; align-items:center; justify-content:space-between; gap:8px}
+  .brand{display:flex; align-items:center; gap:10px}
+  .logo{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#ff8a8a,#ff5252);display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 8px 28px rgba(255,82,82,0.12)}
+  h1{font-size:18px;margin:0}
+  .muted{color:var(--muted); font-size:13px}
 
-  /* --- Top header and "button bar" moved to top --- */
-  header{
-    display:flex; align-items:center; gap:14px; justify-content:space-between;
-  }
-  .brand{
-    display:flex; gap:12px; align-items:center;
-  }
-  .logo{
-    width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#ff8a8a,#ff5252);display:flex;align-items:center;justify-content:center;font-weight:700;
-    box-shadow:0 6px 20px rgba(255,82,82,0.12);
-  }
-  .brand h1{margin:0;font-size:18px}
-  .top-buttons{
-    display:flex; gap:8px; align-items:center;
-  }
-  .btn{
-    background:var(--glass); border:1px solid rgba(255,255,255,0.04); padding:10px 12px; border-radius:12px; cursor:pointer;
-    color:var(--muted); font-weight:600; font-size:14px;
-  }
-  .btn.primary{ background:linear-gradient(90deg,var(--accent),#ff8a8a); color:white; border:none; box-shadow:0 8px 24px rgba(255,82,82,0.14); }
+  /* Top controls (compact on mobile) */
+  .top-controls{display:flex; gap:8px; align-items:center}
+  .btn{background:var(--glass); border:0;padding:8px 10px;border-radius:10px; font-weight:600; color:var(--muted); cursor:pointer}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),#ff8a8a); color:white; box-shadow:0 8px 20px rgba(255,82,82,0.14)}
 
-  /* --- Main layout --- */
-  .main{
-    display:grid; grid-template-columns: 320px 1fr; gap:18px; width:100%;
-  }
-  .sidebar{
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:var(--radius); padding:14px; min-height:380px;
-  }
-  .card{
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    border-radius:16px; padding:12px;
-  }
+  /* Main layout */
+  .main{display:flex; gap:12px; flex-direction:column}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:12px; border-radius:14px}
+  .video-grid{display:grid; gap:12px; grid-template-columns: repeat(2, 1fr);}
+  .video{border-radius:12px; overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02)); cursor:pointer}
+  .thumb{width:100%; aspect-ratio:16/9; object-fit:cover; display:block}
+  .meta{padding:8px}
+  .meta h3{margin:0;font-size:14px}
+  .meta p{margin:6px 0 0 0;color:var(--muted);font-size:12px}
 
-  /* --- Search at bottom --- */
-  .search-bar{
-    position:fixed; left:50%; transform:translateX(-50%); bottom:20px; width:calc(100% - 40px); max-width:840px;
-    display:flex; gap:12px; align-items:center; padding:12px; border-radius:28px;
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); box-shadow:0 10px 30px rgba(0,0,0,0.6);
-    backdrop-filter: blur(6px);
-  }
-  .search-bar input{
-    background:transparent; border:0; outline:none; color:#eaf2f6; font-size:16px; flex:1;
-  }
-  .search-bar .search-btn{padding:10px 16px; border-radius:12px; border:none; cursor:pointer;}
-  .search-bar .search-btn.primary{ background:var(--accent); color:white; }
+  /* Search bottom */
+  .search-bar{position:fixed; left:50%; transform:translateX(-50%); bottom:16px; width:calc(100% - 28px); max-width:760px; display:flex; gap:8px; align-items:center; padding:10px 10px; border-radius:28px; background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); box-shadow:0 18px 40px rgba(0,0,0,0.6); z-index:30}
+  .search-bar input{background:transparent;border:0;outline:none;color:#eaf2f6;font-size:15px;flex:1}
+  .search-btn{padding:8px 12px;border-radius:12px;border:0;cursor:pointer}
 
-  /* --- Video grid --- */
-  .videos{ display:grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap:16px; align-items:start;}
-  .video{
-    border-radius:12px; overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
-    cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
-  }
-  .video:hover{ transform:translateY(-6px); box-shadow:0 20px 40px rgba(2,6,23,0.6); }
-  .thumb{ width:100%; aspect-ratio:16/9; object-fit:cover; display:block; }
-  .meta{ padding:10px; }
-  .meta h3{ margin:0 0 6px 0; font-size:15px; color:#eaf2f6; }
-  .meta p{ margin:0; font-size:13px; color:var(--muted); }
+  /* Player modal */
+  .player-overlay{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.7); z-index:50}
+  .player-overlay.show{display:flex}
+  .player-card{width:95%; max-width:980px; border-radius:12px; overflow:hidden; background:#000}
+  .player-card iframe{width:100%; height:56vh; border:0}
 
-  /* --- Player modal --- */
-  .player-modal{
-    position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.6); z-index:1200;
-  }
-  .player-modal.show{ display:flex; }
-  .player-card{ width:90%; max-width:1100px; background:var(--card); border-radius:16px; padding:12px; }
-  .player-card iframe{ width:100%; height:60vh; border:0; border-radius:8px; }
+  /* Modals */
+  .modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.6); z-index:60}
+  .modal.show{display:flex}
+  .dialog{width:94%; max-width:760px; max-height:86vh; overflow:auto; background:linear-gradient(180deg,#0b0b0d,#111217); border-radius:16px; padding:18px; box-shadow:0 30px 80px rgba(0,0,0,0.7)}
+  .dialog h2{margin:0 0 8px 0}
+  .actions{display:flex; gap:8px; justify-content:flex-end; margin-top:10px}
 
-  /* --- Modal styles (consent/warning/register) --- */
-  .modal{
-    position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.6); z-index:1300;
-  }
-  .modal.show{ display:flex; }
-  .modal .dialog{
-    width:92%; max-width:920px; max-height:88vh; overflow:auto; background:linear-gradient(180deg,#0b0b0d,#101014); border-radius:20px; padding:22px; box-shadow:0 30px 80px rgba(0,0,0,0.7);
-  }
-  .modal h2{ margin:0 0 12px 0; font-size:20px; color:#fff}
-  .modal p{ color:var(--muted); line-height:1.5; white-space:pre-wrap; }
+  /* Floating profile button */
+  .fab{position:fixed; right:18px; bottom:92px; width:62px; height:62px; border-radius:50%; background:linear-gradient(135deg,#ff6b6b,#ff8a8a); box-shadow:0 20px 40px rgba(255,82,82,0.18); display:flex; align-items:center; justify-content:center; color:white; font-weight:700; z-index:40; cursor:pointer}
+  .fab.hidden{display:none}
 
-  .modal .actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:16px; }
+  /* Profile mini */
+  .profile-box{display:flex;flex-direction:column;gap:8px}
+  .form-input{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:10px;border-radius:10px;color:#eaf2f6}
 
-  /* --- small helpers --- */
-  .muted{ color:var(--muted); font-size:13px }
-  .flex{ display:flex; gap:10px; align-items:center }
-  .form-input{ background:transparent; border:1px solid rgba(255,255,255,0.04); padding:10px; border-radius:10px; color:#eaf2f6; width:100% }
-  footer{ padding:14px; color:var(--muted); font-size:13px; text-align:center }
-  @media(max-width:880px){
-    .main{ grid-template-columns: 1fr; }
-    .sidebar{ order:2; }
+  /* responsive */
+  @media (max-width:720px){
+    .video-grid{grid-template-columns: 1fr}
+    header{padding-right:6px}
+    .search-bar{width:calc(100% - 20px)}
+    .fab{right:12px; bottom:86px; width:56px; height:56px}
   }
+  footer{padding:22px 12px 80px 12px; text-align:center; color:var(--muted); font-size:13px}
 </style>
 </head>
 <body>
@@ -124,372 +79,440 @@
       <div class="logo">YF</div>
       <div>
         <h1>YouFurry</h1>
-        <div class="muted">Відеоплатформа тестового формату</div>
+        <div class="muted">Відео — твій стиль</div>
       </div>
     </div>
-
-    <div class="top-buttons">
+    <div class="top-controls">
       <button class="btn" id="homeBtn">Головна</button>
-      <button class="btn" id="subscriptionsBtn">Підписки</button>
-      <button class="btn" id="libraryBtn">Бібліотека</button>
       <button class="btn primary" id="uploadBtn">Завантажити</button>
-      <button class="btn" id="authBtn">Увійти / Реєстрація</button>
+      <button class="btn" id="authTopBtn">Увійти</button>
     </div>
   </header>
 
   <main class="main">
-    <aside class="sidebar card">
-      <h3>Навігація</h3>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
-        <button class="btn">Дивитися пізніше</button>
-        <button class="btn">Підписки</button>
-        <button class="btn">Тренди</button>
-        <button class="btn">Налаштування</button>
-      </div>
-      <hr style="margin:12px 0; border:none; border-top:1px solid rgba(255,255,255,0.03)" />
-      <div class="muted">Рекомендації</div>
-      <div id="recommendations" style="margin-top:10px; display:flex; flex-direction:column; gap:8px"></div>
-    </aside>
-
-    <section>
-      <div class="card" style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center">
+    <section class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
-          <h2 style="margin:0">Рекомендовані відео</h2>
-          <div class="muted">Пошук, відтворення та базова рекомендована стрічка</div>
+          <strong>Рекомендоване</strong>
+          <div class="muted">Пошук. Відтворення. Тестова стрічка</div>
         </div>
-        <div class="muted">Вхід: <span id="userLabel">анонім</span></div>
+        <div class="muted">Користувач: <span id="userLabel">анонім</span></div>
       </div>
+    </section>
 
-      <div id="videoGrid" class="videos"></div>
+    <section id="gridSection" class="card">
+      <div id="videoGrid" class="video-grid"></div>
     </section>
   </main>
 
-  <!-- Search at bottom -->
   <div class="search-bar" role="search" aria-label="Пошук відео">
     <input id="searchInput" placeholder="Пошук відео, каналів, тем..." />
-    <button class="search-btn" id="voiceBtn" title="Голосовий пошук (поки що заглушка)">🎤</button>
-    <button class="search-btn primary" id="searchBtn">Пошук</button>
+    <button class="search-btn" id="searchBtn">Пошук</button>
   </div>
 
-  <footer>© YouFurry — експериментальний інтерфейс • Не зберігаємо відео локально</footer>
+  <footer>© YouFurry — тестовий інтерфейс • Не зберігаємо відео локально</footer>
 </div>
 
-<!-- Player modal -->
-<div id="playerModal" class="player-modal" aria-hidden="true">
-  <div class="player-card card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <strong id="playerTitle">Відтворення</strong>
-      <div><button class="btn" id="closePlayer">Закрити</button></div>
-    </div>
-    <iframe id="playerFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<!-- Player -->
+<div id="playerModal" class="player-overlay" aria-hidden="true">
+  <div class="player-card">
+    <iframe id="playerFrame" src="" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
   </div>
 </div>
 
-<!-- Consent modal (big text) -->
+<!-- Consent modal -->
 <div id="consentModal" class="modal" role="dialog" aria-modal="true">
   <div class="dialog">
-    <h2>Угода користувача — YouFurry (тестова)</h2>
-    <p>
-      Шановний(-а) користувачу! Дякуємо за інтерес до YouFurry — експериментальної платформи для перегляду та пошуку відео.
-      Перед тим як продовжити, будь ласка, уважно ознайомтеся з цією угодою. Використовуючи додаток YouFurry, ви погоджуєтесь з умовами нижче.
-      
-      1) Суть послуги: YouFurry надається як тестовий інтерфейс для пошуку та перегляду відео через відкриті API. Деякі функції — чернетки або прототипи.
-      
-      2) Відповідальність: Розробники не несуть відповідальності за точність контенту, технічні збої, втрату даних або інші несправності. Ви берете на себе ризики використання програмного продукту в поточному вигляді.
-      
-      3) Конфіденційність: Для роботи може використовуватись локальне збереження даних (localStorage) для зручності — наприклад, налаштування та тестові облікові дані. Чутливі дані не передаються на зовнішні сервери цим прототипом (за винятком запитів до YouTube API).
-      
-      4) API-ключ: Додавши API-ключ для пошуку, ви погоджуєтесь з тим, що використання ключа підпорядковується правилам постачальника API. Будь ласка, уникайте розповсюдження ключа в публічних репозиторіях.
-      
-      5) Правила використання контенту: Весь відеоконтент належить правовласникам. YouFurry надає лише інтерфейс доступу до метаданих та вбудованого програвача.
-      
-      6) Зміни: Ця тестова угода може оновлюватися без попереднього повідомлення з метою розвитку продукту.
-      
-      Натиснувши "Я згоден(на)", ви підтверджуєте, що прочитали та погоджуєтесь з цими умовами.
+    <h2>Угода користувача — YouFurry</h2>
+    <p style="white-space:pre-wrap; color:var(--muted)">
+      Дякуємо, що тестуєте YouFurry. Це тестова збірка інтерфейсу для пошуку та відтворення відео.
+      Використовуючи застосунок, ви погоджуєтесь з тим, що деякі функції є експериментальними та можуть працювати нестабільно.
+      Додаток використовує YouTube Data API для пошуку та вбудованих відео.
+      Натиснувши "Приймаю", ви підтверджуєте ознайомлення з особливостями роботи та погоджуєтесь продовжити.
     </p>
     <div class="actions">
       <button class="btn" id="consentDecline">Відмовити</button>
-      <button class="btn primary" id="consentAccept">Я згоден(на)</button>
+      <button class="btn primary" id="consentAccept">Приймаю</button>
     </div>
   </div>
 </div>
 
-<!-- Warning modal -->
-<div id="warningModal" class="modal" role="dialog" aria-modal="true">
-  <div class="dialog">
-    <h2>Увага — тестова версія</h2>
-    <p>
-      Зверніть увагу: YouFurry знаходиться у стадії тестування. Деякі функції можуть поводитись некоректно або бути тимчасово відключені.
-      Можливі затримки при пошуку відео, помилки при відтворенні, а також обмеження API (кількість запитів).
-      Якщо ви натрапите на помилку — будь ласка, зафіксуйте її у консоль браузера або збережіть ID та надішліть розробнику.
-    </p>
-    <div class="actions">
-      <button class="btn primary" id="warningOk">Розумію</button>
-    </div>
-  </div>
-</div>
-
-<!-- Register / Login modal -->
+<!-- Auth modal (register/login) -->
 <div id="authModal" class="modal" role="dialog" aria-modal="true">
   <div class="dialog" style="max-width:520px">
-    <h2>Реєстрація / Вхід</h2>
-    <p class="muted">Це локальна (тестова) форма — дані зберігаються у вашому браузері (localStorage).</p>
-    <div style="display:grid;gap:8px;margin-top:10px">
-      <input id="authEmail" class="form-input" placeholder="Email або ім'я" />
-      <input id="authPwd" class="form-input" placeholder="Пароль" type="password" />
-      <div style="display:flex;gap:8px">
+    <h2 id="authTitle">Реєстрація / Вхід</h2>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+      <input id="regName" class="form-input" placeholder="Ім'я (псевдонім)" />
+      <input id="regEmail" class="form-input" placeholder="Email" />
+      <input id="regPass" class="form-input" type="password" placeholder="Пароль" />
+      <div style="display:flex; gap:8px;">
         <button class="btn primary" id="registerBtn">Зареєструватись</button>
         <button class="btn" id="loginBtn">Увійти</button>
-        <button class="btn" id="closeAuth">Закрити</button>
+        <button class="btn" id="authCloseBtn">Закрити</button>
       </div>
-      <div id="authInfo" class="muted"></div>
+      <div id="authMsg" class="muted"></div>
     </div>
   </div>
 </div>
 
+<!-- Profile modal -->
+<div id="profileModal" class="modal" role="dialog" aria-modal="true">
+  <div class="dialog" style="max-width:480px">
+    <h2>Твій профіль</h2>
+    <div class="profile-box">
+      <label class="muted">Ім'я</label>
+      <input id="profileName" class="form-input"/>
+      <label class="muted">Пошта</label>
+      <input id="profileEmail" class="form-input"/>
+      <label class="muted">Новий пароль</label>
+      <input id="profilePass" type="password" class="form-input" placeholder="залиш пустим, якщо не змінювати"/>
+      <div style="display:flex; gap:8px;">
+        <button class="btn primary" id="saveProfileBtn">Зберегти</button>
+        <button class="btn" id="logoutBtn">Вихід</button>
+        <button class="btn" id="profileCloseBtn">Закрити</button>
+      </div>
+      <div id="profileMsg" class="muted"></div>
+    </div>
+    <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03); margin:12px 0"/>
+    <div>
+      <strong>Логи реєстрацій (локально)</strong>
+      <div id="regLogs" class="muted" style="font-size:13px; margin-top:8px; max-height:160px; overflow:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Floating profile action button -->
+<button id="fabProfile" class="fab hidden" title="Мій профіль">Я</button>
+
 <script>
-/*
-  YouFurry — single-file prototype
-  - YouTube Data API v3 search endpoints used (key below)
-  - Local storage flags:
-      youfurry_consent_accepted
-      youfurry_seen_warning
-      youfurry_user   -> {name,email}
-  - This is a prototype: do not store real passwords here.
+/* YouFurry mobile single-file prototype
+   - Local "DB" (localStorage): youfurry_users (array), youfurry_current (object), youfurry_reglogs (array)
+   - For production, replace localStorage flows with secure server API calls (example commented below)
 */
 
-// ====== CONFIG ======
-const YOUTUBE_API_KEY = 'AIzaSyBVqXcayVNDN63l4WpH2HOrTfAqzh3DTXo'; // твоє значення
+// ===== CONFIG =====
+const YOUTUBE_API_KEY = 'AIzaSyBVqXcayVNDN63l4WpH2HOrTfAqzh3DTXo';
 const YOUTUBE_SEARCH_API = 'https://www.googleapis.com/youtube/v3/search';
-const YOUTUBE_VIDEOS_API = 'https://www.googleapis.com/youtube/v3/videos';
 
-// ====== UI refs ======
+// ===== ELEMENTS =====
 const consentModal = document.getElementById('consentModal');
-const warningModal = document.getElementById('warningModal');
 const authModal = document.getElementById('authModal');
+const profileModal = document.getElementById('profileModal');
 const playerModal = document.getElementById('playerModal');
-const playerFrame = document.getElementById('playerFrame');
-const playerTitle = document.getElementById('playerTitle');
+
+const authTopBtn = document.getElementById('authTopBtn');
+const registerBtn = document.getElementById('registerBtn');
+const loginBtn = document.getElementById('loginBtn');
+const authCloseBtn = document.getElementById('authCloseBtn');
+const authMsg = document.getElementById('authMsg');
+
+const fabProfile = document.getElementById('fabProfile');
+const userLabel = document.getElementById('userLabel');
+
+const regName = document.getElementById('regName');
+const regEmail = document.getElementById('regEmail');
+const regPass = document.getElementById('regPass');
+
+const profileName = document.getElementById('profileName');
+const profileEmail = document.getElementById('profileEmail');
+const profilePass = document.getElementById('profilePass');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const profileMsg = document.getElementById('profileMsg');
+const regLogsEl = document.getElementById('regLogs');
 
 const searchInput = document.getElementById('searchInput');
 const searchBtn = document.getElementById('searchBtn');
 const videoGrid = document.getElementById('videoGrid');
-const recommendationsEl = document.getElementById('recommendations');
-const userLabel = document.getElementById('userLabel');
-const authBtn = document.getElementById('authBtn');
+const playerFrame = document.getElementById('playerFrame');
 
-// ====== On load: show modals in sequence if not accepted ======
-window.addEventListener('load', () => {
-  const accepted = localStorage.getItem('youfurry_consent_accepted');
-  if (!accepted) {
-    showModal(consentModal);
-  } else {
-    const warned = localStorage.getItem('youfurry_seen_warning');
-    if (!warned) showModal(warningModal);
-  }
-  loadUserFromStorage();
-  fetchRecommendations(); // initial recommendation load
-  fetchPopular(); // additional grid load
-});
-
-// ====== Modal helpers ======
+// ===== Modal helpers =====
 function showModal(el){ el.classList.add('show'); el.setAttribute('aria-hidden','false'); }
 function hideModal(el){ el.classList.remove('show'); el.setAttribute('aria-hidden','true'); }
 
-// Consent modal actions
+// ===== On load =====
+window.addEventListener('load', () => {
+  const consent = localStorage.getItem('youfurry_consent_accepted');
+  if (!consent) showModal(consentModal);
+  else initApp();
+});
+
+// Consent actions
 document.getElementById('consentAccept').addEventListener('click', () => {
   localStorage.setItem('youfurry_consent_accepted','1');
   hideModal(consentModal);
-  showModal(warningModal);
+  initApp();
 });
 document.getElementById('consentDecline').addEventListener('click', () => {
-  // If declined — keep them but do not allow further usage: we will hide app controls
-  alert('Ви відхилили угоду — доступ до застосунку обмежено.');
+  alert('Ви відхилили умови — доступ до додатку обмежено.');
   document.getElementById('app').style.filter = 'blur(4px) grayscale(.6)';
   hideModal(consentModal);
 });
 
-// Warning modal action
-document.getElementById('warningOk').addEventListener('click', () => {
-  localStorage.setItem('youfurry_seen_warning','1');
-  hideModal(warningModal);
+// Initialize app: load initial content and UI state
+function initApp(){
+  loadUserState();
+  fetchInitialVideos();
+  fetchRecommendations(); // optional
+}
+
+// ======= USER STORAGE HELPERS (LOCAL) =======
+function getUsers(){ try { return JSON.parse(localStorage.getItem('youfurry_users') || '[]'); } catch(e){ return []; } }
+function saveUsers(arr){ localStorage.setItem('youfurry_users', JSON.stringify(arr)); }
+function getCurrentUser(){ try { return JSON.parse(localStorage.getItem('youfurry_current') || 'null'); } catch(e){ return null; } }
+function setCurrentUser(u){ localStorage.setItem('youfurry_current', JSON.stringify(u)); }
+function clearCurrentUser(){ localStorage.removeItem('youfurry_current'); }
+
+function pushRegLog(entry){
+  const logs = JSON.parse(localStorage.getItem('youfurry_reglogs') || '[]');
+  logs.unshift(entry); // newest first
+  localStorage.setItem('youfurry_reglogs', JSON.stringify(logs));
+}
+function getRegLogs(){ try { return JSON.parse(localStorage.getItem('youfurry_reglogs') || '[]'); } catch(e){ return []; } }
+
+// ======= AUTH / REGISTER FLOW (local) =======
+authTopBtn.addEventListener('click', () => { openAuthModal(); });
+
+function openAuthModal(){
+  regName.value = ''; regEmail.value = ''; regPass.value = ''; authMsg.textContent = '';
+  showModal(authModal);
+}
+
+authCloseBtn.addEventListener('click', ()=> hideModal(authModal));
+
+// Register
+registerBtn.addEventListener('click', () => {
+  const name = regName.value.trim();
+  const email = regEmail.value.trim().toLowerCase();
+  const pass = regPass.value;
+  if (!name || !email || !pass) { authMsg.textContent = 'Введіть імʼя, пошту та пароль.'; return; }
+  const users = getUsers();
+  if (users.find(u => u.email === email)){ authMsg.textContent = 'Користувач з такою поштою вже існує.'; return; }
+
+  // Save user locally (note: passwords stored as plain text here — demo only)
+  const user = { id: 'u_'+Date.now(), name, email, pass };
+  users.push(user);
+  saveUsers(users);
+  setCurrentUser({ id: user.id, name: user.name, email: user.email });
+  pushRegLog({ id: user.id, email: user.email, time: new Date().toISOString() });
+
+  // Optionally send to backend (example commented below)
+  /*
+  fetch('/api/register', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ name, email, password: pass })
+  }).then(r=>r.json()).then(console.log).catch(console.error);
+  */
+
+  authMsg.textContent = 'Зареєстровано та увійшли.';
+  hideModal(authModal);
+  refreshUIAfterAuth();
 });
 
-// ====== Auth modal actions (simple localStorage) ======
-document.getElementById('registerBtn').addEventListener('click', () => {
-  const name = document.getElementById('authEmail').value.trim();
-  const pwd = document.getElementById('authPwd').value;
-  const info = document.getElementById('authInfo');
-  if (!name || !pwd) { info.textContent = 'Введіть email/ім’я та пароль.'; return; }
-  // Save simple "user"
-  const user = { name, pwd };
-  localStorage.setItem('youfurry_user', JSON.stringify(user));
-  info.textContent = 'Зареєстровано локально. Ви увійшли.';
-  updateUserLabel(user);
-  setTimeout(()=> hideModal(authModal), 800);
+// Login
+loginBtn.addEventListener('click', () => {
+  const email = regEmail.value.trim().toLowerCase();
+  const pass = regPass.value;
+  if (!email || !pass) { authMsg.textContent = 'Введіть пошту та пароль.'; return; }
+  const users = getUsers();
+  const found = users.find(u => u.email === email && u.pass === pass);
+  if (!found){ authMsg.textContent = 'Невірні облікові дані.'; return; }
+  setCurrentUser({ id: found.id, name: found.name, email: found.email });
+  authMsg.textContent = 'Успішний вхід.';
+  hideModal(authModal);
+  refreshUIAfterAuth();
 });
-document.getElementById('loginBtn').addEventListener('click', () => {
-  const name = document.getElementById('authEmail').value.trim();
-  const pwd = document.getElementById('authPwd').value;
-  const info = document.getElementById('authInfo');
-  const raw = localStorage.getItem('youfurry_user');
-  if (!raw) { info.textContent = 'Користувач не знайдений. Зареєструйтеся.'; return; }
-  const saved = JSON.parse(raw);
-  if (saved.name === name && saved.pwd === pwd) {
-    info.textContent = 'Ласкаво просимо назад!';
-    updateUserLabel(saved);
-    setTimeout(()=> hideModal(authModal), 700);
-  } else info.textContent = 'Невірні облікові дані.';
-});
-document.getElementById('closeAuth').addEventListener('click', ()=> hideModal(authModal));
-document.getElementById('authBtn').addEventListener('click', ()=> showModal(authModal));
 
-function loadUserFromStorage(){
-  const raw = localStorage.getItem('youfurry_user');
-  if (raw) {
-    try{
-      const user = JSON.parse(raw);
-      updateUserLabel(user);
-    }catch(e){}
+// ===== Profile modal logic =====
+fabProfile.addEventListener('click', () => {
+  openProfile();
+});
+
+function openProfile(){
+  const cu = getCurrentUser();
+  if (!cu) return;
+  profileName.value = cu.name || '';
+  profileEmail.value = cu.email || '';
+  profilePass.value = '';
+  profileMsg.textContent = '';
+  renderRegLogs();
+  showModal(profileModal);
+}
+document.getElementById('profileCloseBtn').addEventListener('click', ()=> hideModal(profileModal));
+
+// Save profile changes
+saveProfileBtn.addEventListener('click', () => {
+  const cu = getCurrentUser();
+  if (!cu){ profileMsg.textContent = 'Не знайдено користувача.'; return; }
+  const name = profileName.value.trim();
+  const email = profileEmail.value.trim().toLowerCase();
+  const newPass = profilePass.value;
+
+  if (!name || !email){ profileMsg.textContent = 'Імʼя та пошта не можуть бути порожніми.'; return; }
+
+  // Update in users array
+  const users = getUsers();
+  const idx = users.findIndex(u => u.id === cu.id);
+  if (idx === -1){ profileMsg.textContent = 'Користувач не знайдений.'; return; }
+
+  // Email uniqueness check (if changed)
+  if (email !== users[idx].email && users.find(u => u.email === email)){ profileMsg.textContent = 'Ця пошта вже зайнята.'; return; }
+
+  users[idx].name = name;
+  users[idx].email = email;
+  if (newPass) users[idx].pass = newPass; // demo only
+  saveUsers(users);
+
+  // update current
+  setCurrentUser({ id: users[idx].id, name: users[idx].name, email: users[idx].email });
+  profileMsg.textContent = 'Профіль оновлено.';
+  userLabel.textContent = users[idx].name;
+  // optionally notify backend about profile change (commented)
+  /*
+  fetch('/api/update-profile', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ id: users[idx].id, name, email })
+  });
+  */
+});
+
+// Logout
+logoutBtn.addEventListener('click', () => {
+  clearCurrentUser();
+  hideModal(profileModal);
+  refreshUIAfterAuth();
+});
+
+// ===== UI update after auth =====
+function loadUserState(){
+  const cu = getCurrentUser();
+  if (cu){
+    userLabel.textContent = cu.name || cu.email;
+    authTopBtn.style.display = 'none';
+    fabProfile.classList.remove('hidden');
+  } else {
+    userLabel.textContent = 'анонім';
+    authTopBtn.style.display = 'inline-flex';
+    fabProfile.classList.add('hidden');
   }
 }
-function updateUserLabel(user){
-  if (!user) userLabel.textContent = 'анонім';
-  else userLabel.textContent = user.name || 'користувач';
+function refreshUIAfterAuth(){
+  loadUserState();
+  // you may refresh recommendations personalized per user
 }
 
-// ====== Player controls ======
-document.getElementById('closePlayer').addEventListener('click', () => {
-  playerFrame.src = '';
-  hideModal(playerModal);
-});
+// ===== Registration logs render =====
+function renderRegLogs(){
+  const logs = getRegLogs();
+  if (!logs.length){ regLogsEl.innerHTML = '<div class="muted">Немає локальних логів реєстрацій</div>'; return; }
+  regLogsEl.innerHTML = logs.map(l => {
+    const d = new Date(l.time);
+    return `<div style="padding:6px;border-radius:8px;background:rgba(255,255,255,0.01);margin-bottom:6px">
+      <div style="font-size:13px">${escapeHtml(l.email)}</div>
+      <div class="muted" style="font-size:12px">${d.toLocaleString()}</div>
+    </div>`;
+  }).join('');
+}
 
-// ====== Search & API helpers ======
+// ====== SEARCH & YOUTUBE API ======
 searchBtn.addEventListener('click', () => doSearch(searchInput.value.trim()));
 searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(searchInput.value.trim()); });
 
-async function doSearch(q) {
+async function doSearch(q){
   if (!q) return;
   videoGrid.innerHTML = '<div class="muted">Пошук...</div>';
   try {
     const params = new URLSearchParams({
-      key: YOUTUBE_API_KEY,
-      part: 'snippet',
-      q,
-      maxResults: 12,
-      type: 'video',
-      safeSearch: 'moderate'
+      key: YOUTUBE_API_KEY, part: 'snippet', q, maxResults: 12, type: 'video', safeSearch: 'moderate'
     });
-    const url = YOUTUBE_SEARCH_API + '?' + params.toString();
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('API error ' + res.status);
+    const res = await fetch(YOUTUBE_SEARCH_API + '?' + params.toString());
+    if (!res.ok) throw new Error('API ' + res.status);
     const data = await res.json();
-    renderVideos(data.items);
-  } catch (err) {
+    renderVideos(data.items || []);
+  } catch(err){
     console.error(err);
-    videoGrid.innerHTML = '<div class="muted">Помилка пошуку — перевірте ключ API або мережу. Деталі в консолі.</div>';
+    videoGrid.innerHTML = '<div class="muted">Помилка при пошуку. Перевірте ключ або мережу. Деталі в консолі.</div>';
   }
 }
 
 function renderVideos(items){
-  if (!items || items.length === 0) { videoGrid.innerHTML = '<div class="muted">Нічого не знайдено.</div>'; return; }
+  if (!items || items.length === 0){ videoGrid.innerHTML = '<div class="muted">Нічого не знайдено.</div>'; return; }
   videoGrid.innerHTML = '';
   items.forEach(it => {
-    const vidId = it.id?.videoId || (it.id && it.id.videoId) || (it.id && it.id);
-    const thumb = it.snippet.thumbnails?.high?.url || it.snippet.thumbnails?.medium?.url || '';
-    const title = it.snippet.title;
-    const channel = it.snippet.channelTitle;
+    const vidId = it.id && it.id.videoId;
+    const thumb = (it.snippet.thumbnails && (it.snippet.thumbnails.high?.url || it.snippet.thumbnails.medium?.url || it.snippet.thumbnails.default?.url)) || '';
+    const title = it.snippet.title || '';
+    const channel = it.snippet.channelTitle || '';
     const el = document.createElement('div');
     el.className = 'video';
     el.innerHTML = `
       <img class="thumb" src="${thumb}" loading="lazy" alt="${escapeHtml(title)}" />
       <div class="meta">
-        <h3>${escapeHtml(shorten(title, 72))}</h3>
+        <h3>${escapeHtml(shorten(title,72))}</h3>
         <p class="muted">${escapeHtml(channel)}</p>
       </div>
     `;
-    el.addEventListener('click', () => openPlayer(vidId, title));
+    el.addEventListener('click', () => openPlayer(vidId));
     videoGrid.appendChild(el);
   });
 }
 
-function openPlayer(videoId, title) {
-  playerFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
-  playerTitle.textContent = title || 'Відтворення';
+function openPlayer(id){
+  if(!id) return;
+  playerFrame.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
   showModal(playerModal);
 }
+playerModal.addEventListener('click', (e) => { if (e.target === playerModal) { playerFrame.src=''; hideModal(playerModal); } });
 
-// ====== Recommendations & Popular fetch ======
-async function fetchRecommendations(){
-  // Simple approach: do a search for "recommended" topics (you can refine)
+// initial fetch
+async function fetchInitialVideos(){
+  // basic popular-like query: music
   try {
-    const params = new URLSearchParams({
-      key: YOUTUBE_API_KEY,
-      part: 'snippet',
-      q: 'тренди відео розважальне',
-      maxResults: 6,
-      type: 'video',
-    });
-    const url = YOUTUBE_SEARCH_API + '?' + params.toString();
-    const res = await fetch(url);
-    if (res.ok){
-      const data = await res.json();
-      recommendationsEl.innerHTML = '';
-      (data.items || []).forEach(it => {
-        const d = document.createElement('div');
-        d.style.display='flex'; d.style.gap='8px'; d.style.alignItems='center';
-        d.innerHTML = `<img src="${it.snippet.thumbnails?.default?.url}" style="width:64px;height:44px;border-radius:8px;object-fit:cover" />
-          <div style="flex:1"><div style="font-size:13px">${shorten(it.snippet.title,40)}</div><div class="muted" style="font-size:12px">${it.snippet.channelTitle}</div></div>`;
-        d.addEventListener('click', ()=> openPlayer(it.id.videoId, it.snippet.title));
-        recommendationsEl.appendChild(d);
-      });
-    } else {
-      recommendationsEl.innerHTML = '<div class="muted">Не вдалося завантажити рекомендації</div>';
-    }
-  } catch (e) {
-    console.error(e);
-    recommendationsEl.innerHTML = '<div class="muted">Помилка мережі при завантаженні рекомендацій</div>';
-  }
-}
-
-async function fetchPopular(){
-  // Fallback: search for 'music' to fill grid initially
-  try {
-    const params = new URLSearchParams({
-      key: YOUTUBE_API_KEY,
-      part: 'snippet',
-      q: 'music',
-      maxResults: 12,
-      type: 'video'
-    });
+    const params = new URLSearchParams({ key: YOUTUBE_API_KEY, part: 'snippet', q: 'music', maxResults: 8, type: 'video' });
     const res = await fetch(YOUTUBE_SEARCH_API + '?' + params.toString());
     const data = await res.json();
-    renderVideos(data.items);
-  } catch (e) {
-    console.error(e);
+    renderVideos(data.items || []);
+  } catch(e){
     videoGrid.innerHTML = '<div class="muted">Не вдалося завантажити початкову стрічку.</div>';
   }
 }
 
-// ====== Utilities ======
+async function fetchRecommendations(){
+  // simple recommendations: query by "trending"
+  try {
+    const params = new URLSearchParams({ key: YOUTUBE_API_KEY, part: 'snippet', q: 'trending video', maxResults: 4, type: 'video' });
+    const res = await fetch(YOUTUBE_SEARCH_API + '?' + params.toString());
+    // not used heavily, but triggers caching for user
+  } catch(e){}
+}
+
+// ===== Utilities =====
 function shorten(s,n){ if(!s) return ''; return s.length>n? s.slice(0,n-1)+'…':s; }
 function escapeHtml(s){ return s ? s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) : ''; }
 
-// ====== Small helpers for buttons in header ----
-document.getElementById('homeBtn').addEventListener('click', () => { fetchPopular(); window.scrollTo({top:0,behavior:'smooth'}); });
-document.getElementById('uploadBtn').addEventListener('click', () => alert('Функція завантаження недоступна у тестовій версії.'));
-document.getElementById('subscriptionsBtn').addEventListener('click', () => alert('Підписки: демонстраційний розділ.'));
-document.getElementById('libraryBtn').addEventListener('click', () => alert('Бібліотека: поки порожньо.'));
+// ===== Example: How to send registration to a real backend (EXAMPLE) =====
+/*
+function sendRegistrationToServer(name, email, password){
+  // PRODUCTION: never send raw password without HTTPS and server-side hashing.
+  return fetch('https://your-server.example.com/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, password })
+  }).then(res => res.json());
+}
+*/
 
-// ====== small keyboard cheat: "r" to reopen modals for testing =====
-document.addEventListener('keydown',(e)=>{
-  if (e.key === 'r') { showModal(consentModal); }
-});
+// ===== small helpers: home/upload buttons =====
+document.getElementById('homeBtn').addEventListener('click', () => fetchInitialVideos());
+document.getElementById('uploadBtn').addEventListener('click', () => alert('Завантаження поки недоступне в тестовій версії.'));
 
-// Note: This is a prototype. For production:
-// - Не зберігайте секретні ключі у відкритому JS.
-// - Робіть бекенд-проксі для API-ключів, додайте автентифікацію та захист від витоку ключів.
-// - Паролі в localStorage — небезпечно.
+// ===== ensure UI shows correct auth state on start =====
+loadUserState();
+
+// small dev helper: press 'r' to reopen consent
+document.addEventListener('keydown', (e) => { if (e.key === 'r') showModal(consentModal); });
 </script>
 </body>
 </html>
