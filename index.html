@@ -509,235 +509,128 @@ const videoPlayer = document.getElementById('videoPlayer');
 const playerInfo = document.getElementById('playerInfo');
 const closeButton = document.getElementById('closeButton');
 
-// Mobile-specific
-const topSearchBar = document.getElementById('topSearchBar');
-const searchInputMobile = document.getElementById('searchInputMobile');
-const searchButtonMobile = document.getElementById('searchButtonMobile');
-const bottomNav = document.getElementById('bottomNav');
-
 // Sample videos
 const sampleVideos = [
-    {
-        id: { videoId: 'dQw4w9WgXcQ' },
-        snippet: { title: 'Never Gonna Give You Up - Rick Astley', description: 'Official video for Rick Astley - Never Gonna Give You Up', channelTitle: 'Rick Astley', publishedAt: '2009-10-25T06:57:33Z', thumbnails: { medium: { url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg' } } },
-        statistics: { viewCount: '1500000000', likeCount: '12000000' }
-    },
-    {
-        id: { videoId: 'kJQP7kiw5Fk' },
-        snippet: { title: 'Despacito ft. Daddy Yankee', description: 'Luis Fonsi - Despacito ft. Daddy Yankee', channelTitle: 'Luis Fonsi', publishedAt: '2017-01-13T04:59:31Z', thumbnails: { medium: { url: 'https://img.youtube.com/vi/kJQP7kiw5Fk/mqdefault.jpg' } } },
-        statistics: { viewCount: '8000000000', likeCount: '50000000' }
-    },
-    {
-        id: { videoId: '9bZkp7q19f0' },
-        snippet: { title: 'PSY - GANGNAM STYLE', description: 'PSY - GANGNAM STYLE M/V', channelTitle: 'officialpsy', publishedAt: '2012-07-15T07:46:32Z', thumbnails: { medium: { url: 'https://img.youtube.com/vi/9bZkp7q19f0/mqdefault.jpg' } } },
-        statistics: { viewCount: '4500000000', likeCount: '23000000' }
-    }
+  {
+    id: { videoId: 'dQw4w9WgXcQ' },
+    snippet: { title: 'Never Gonna Give You Up - Rick Astley', description: 'Official video for Rick Astley - Never Gonna Give You Up', channelTitle: 'Rick Astley', publishedAt: '2009-10-25T06:57:33Z', thumbnails: { medium: { url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg' } } },
+    statistics: { viewCount: '1500000000', likeCount: '12000000' }
+  },
+  {
+    id: { videoId: 'kJQP7kiw5Fk' },
+    snippet: { title: 'Despacito ft. Daddy Yankee', description: 'Luis Fonsi - Despacito ft. Daddy Yankee', channelTitle: 'Luis Fonsi', publishedAt: '2017-01-13T04:59:31Z', thumbnails: { medium: { url: 'https://img.youtube.com/vi/kJQP7kiw5Fk/mqdefault.jpg' } } },
+    statistics: { viewCount: '8000000000', likeCount: '50000000' }
+  },
+  {
+    id: { videoId: '9bZkp7q19f0' },
+    snippet: { title: 'PSY - GANGNAM STYLE', description: 'PSY - GANGNAM STYLE M/V', channelTitle: 'officialpsy', publishedAt: '2012-07-15T07:46:32Z', thumbnails: { medium: { url: 'https://img.youtube.com/vi/9bZkp7q19f0/mqdefault.jpg' } } },
+    statistics: { viewCount: '4500000000', likeCount: '23000000' }
+  }
 ];
 
-// Developer info modal
-const infoModal = document.createElement('div');
-infoModal.className = 'video-modal';
-infoModal.innerHTML = `
-<div class="video-player-container" style="max-width:600px;padding:24px;text-align:center;">
-  <button class="close-button" id="closeInfoBtn">✕</button>
-  <div style="font-size:16px;line-height:1.6;">
-    <h2>Про розробника</h2>
-    <p>Артем Процко Андрійович — молодий розробник і творець проєкту <b>YouFurry</b>.</p>
-  </div>
-</div>`;
-document.body.appendChild(infoModal);
-document.getElementById('closeInfoBtn').addEventListener('click', () => {
-    infoModal.classList.remove('active');
-    document.body.style.overflow = 'auto';
+document.addEventListener('DOMContentLoaded', () => {
+  // Load popular videos
+  loadPopularVideos();
+
+  // Search
+  if(searchButton) searchButton.addEventListener('click', handleSearch);
+  if(searchInput) searchInput.addEventListener('keypress', e => { if(e.key === 'Enter') handleSearch(); });
+
+  // Close modal
+  if(closeButton) closeButton.addEventListener('click', closeVideoPlayer);
+  if(videoModal) videoModal.addEventListener('click', e => { if(e.target===videoModal) closeVideoPlayer(); });
+
+  // Categories
+  document.querySelectorAll('.category').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('.category').forEach(i=>i.classList.remove('active'));
+      c.classList.add('active');
+      handleCategoryClick(c.textContent);
+    });
+  });
 });
 
-// DOM ready
-document.addEventListener('DOMContentLoaded', function() {
-    handleResponsiveUI();
-    window.addEventListener('resize', handleResponsiveUI);
-
-    loadPopularVideos();
-
-    // Search
-    searchButton.addEventListener('click', handleSearch);
-    searchInput.addEventListener('keypress', e => { if(e.key==='Enter') handleSearch(); });
-    if(searchButtonMobile){
-        searchButtonMobile.addEventListener('click', () => {
-            const q = searchInputMobile.value.trim();
-            if(!q) return;
-            searchInput.value = q;
-            handleSearch();
-        });
-        searchInputMobile.addEventListener('keypress', e => { if(e.key==='Enter') searchButtonMobile.click(); });
-    }
-
-    closeButton.addEventListener('click', closeVideoPlayer);
-    videoModal.addEventListener('click', e => { if(e.target===videoModal) closeVideoPlayer(); });
-
-    // Categories
-    document.querySelectorAll('.category').forEach(c => {
-        c.addEventListener('click', function(){
-            document.querySelectorAll('.category').forEach(i=>i.classList.remove('active'));
-            this.classList.add('active');
-            handleCategoryClick(this.textContent);
-        });
-    });
-
-    // Sidebar
-    document.querySelectorAll('.sidebar .nav-item').forEach(item => {
-        item.addEventListener('click', () => {
-            const text = item.querySelector('.nav-text')?.textContent || '';
-            if(text.includes('Головна')) location.reload();
-            else if(text.includes('Тренди')) { searchInput.value='Тренди цього року'; handleSearch(); }
-            else if(text.includes('Підписки')) showAlertModal('Для цього розділу потрібно мати аккаунт. Функція в розробці.');
-            else if(['Музика','Ігри','Спорт','Навчання'].some(x=>text.includes(x))){ searchInput.value=text; handleSearch(); }
-            else if(text.includes('Артем Процко')) { infoModal.classList.add('active'); document.body.style.overflow='hidden'; }
-        });
-    });
-
-    // Bottom nav
-    document.querySelectorAll('.bottom-nav .nav-item-mobile').forEach(item => {
-        item.addEventListener('click', e => {
-            e.preventDefault();
-            document.querySelectorAll('.bottom-nav .nav-item-mobile').forEach(i=>i.classList.remove('active'));
-            item.classList.add('active');
-        });
-    });
-});
-
-// Responsive UI
-function handleResponsiveUI(){
-    const w = window.innerWidth;
-    if(w<=768){
-        topSearchBar.style.display='flex';
-        bottomNav.style.display='flex';
-        document.getElementById('mainContent').style.paddingTop='76px';
-    } else {
-        topSearchBar.style.display='none';
-        bottomNav.style.display='none';
-        document.getElementById('mainContent').style.paddingTop='20px';
-    }
-}
-
-// Search
+// Functions
 async function handleSearch(){
-    const query = searchInput.value.trim();
-    if(!query) return;
-    videoGrid.innerHTML='<div class="loading">Завантаження...</div>';
-    try{
-        const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`);
-        const data = await res.json();
-        if(data.items && data.items.length>0){
-            const ids = data.items.map(i=>i.id.videoId).join(',');
-            const statsRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${API_KEY}`);
-            const statsData = await statsRes.json();
-            const videos = data.items.map((item,i)=>({...item, statistics: statsData.items[i]?.statistics || {viewCount:'0',likeCount:'0'}}));
-            displayVideos(videos);
-        } else displayVideos(sampleVideos.filter(v=>v.snippet.title.toLowerCase().includes(query.toLowerCase())));
-    }catch{
-        displayVideos(sampleVideos.filter(v=>v.snippet.title.toLowerCase().includes(query.toLowerCase())));
-    }
+  const query = searchInput.value.trim();
+  if(!query) return;
+  videoGrid.innerHTML = '<div class="loading">Завантаження...</div>';
+  try {
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`);
+    const data = await res.json();
+    if(data.items && data.items.length > 0){
+      const ids = data.items.map(i=>i.id.videoId).join(',');
+      const statsRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${API_KEY}`);
+      const statsData = await statsRes.json();
+      const videos = data.items.map((item,i)=>({...item, statistics: statsData.items[i]?.statistics || {viewCount:'0',likeCount:'0'}}));
+      displayVideos(videos);
+    } else displayVideos(sampleVideos.filter(v=>v.snippet.title.toLowerCase().includes(query.toLowerCase())));
+  } catch {
+    displayVideos(sampleVideos.filter(v=>v.snippet.title.toLowerCase().includes(query.toLowerCase())));
+  }
 }
 
-// Load popular
 async function loadPopularVideos(){
-    videoGrid.innerHTML='<div class="loading">Завантаження популярних відео...</div>';
-    try{
-        const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&maxResults=12&regionCode=UA&key=${API_KEY}`);
-        const data = await res.json();
-        if(data.items && data.items.length>0){
-            const videos = data.items.map(i=>({id:{videoId:i.id}, snippet:i.snippet, statistics:i.statistics}));
-            displayVideos(videos);
-        } else displayVideos(sampleVideos);
-    } catch { displayVideos(sampleVideos); }
+  videoGrid.innerHTML = '<div class="loading">Завантаження популярних відео...</div>';
+  try {
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&maxResults=12&regionCode=UA&key=${API_KEY}`);
+    const data = await res.json();
+    if(data.items && data.items.length>0){
+      const videos = data.items.map(i=>({id:{videoId:i.id}, snippet:i.snippet, statistics:i.statistics}));
+      displayVideos(videos);
+    } else displayVideos(sampleVideos);
+  } catch { displayVideos(sampleVideos); }
 }
 
-// Display videos
 function displayVideos(videos){
-    currentVideos = videos;
-    if(videos.length===0){ videoGrid.innerHTML='<div class="loading">Відео не знайдено</div>'; return; }
-    videoGrid.innerHTML = videos.map(video=>`
-        <div class="video-card" onclick="openVideoPlayer('${video.id.videoId}')">
-            <div class="thumbnail">
-                <img src="${video.snippet.thumbnails?.medium?.url}" alt="${escapeHtml(video.snippet.title)}">
-                <div class="duration">5:30</div>
-            </div>
-            <div class="video-info">
-                <div class="video-title">${escapeHtml(video.snippet.title)}</div>
-                <div class="channel-info">
-                    <div class="channel-avatar"><img src="https://via.placeholder.com/36/373737/ffffff?text=${encodeURIComponent(video.snippet.channelTitle.charAt(0))}"></div>
-                    <div style="display:flex;flex-direction:column;">
-                        <div class="channel-name">${escapeHtml(video.snippet.channelTitle)}</div>
-                        <div class="video-stats">${formatViewCount(video.statistics?.viewCount || '0')} переглядів • ${formatTimeAgo(video.snippet.publishedAt)}</div>
-                    </div>
-                </div>
-            </div>
+  currentVideos = videos;
+  if(videos.length===0){ videoGrid.innerHTML='<div class="loading">Відео не знайдено</div>'; return; }
+  videoGrid.innerHTML = videos.map(video=>`
+    <div class="video-card" onclick="openVideoPlayer('${video.id.videoId}')">
+      <div class="thumbnail">
+        <img src="${video.snippet.thumbnails?.medium?.url}" alt="${escapeHtml(video.snippet.title)}">
+        <div class="duration">5:30</div>
+      </div>
+      <div class="video-info">
+        <div class="video-title">${escapeHtml(video.snippet.title)}</div>
+        <div class="channel-info">
+          <div class="channel-avatar"><img src="https://via.placeholder.com/36/373737/ffffff?text=${encodeURIComponent(video.snippet.channelTitle.charAt(0))}"></div>
+          <div style="display:flex;flex-direction:column;">
+            <div class="channel-name">${escapeHtml(video.snippet.channelTitle)}</div>
+            <div class="video-stats">${formatViewCount(video.statistics?.viewCount||'0')} переглядів • ${formatTimeAgo(video.snippet.publishedAt)}</div>
+          </div>
         </div>
-    `).join('');
+      </div>
+    </div>
+  `).join('');
 }
 
-// Open video modal
 function openVideoPlayer(videoId){
-    videoPlayer.innerHTML=''; playerInfo.innerHTML='';
-    const video = currentVideos.find(v=>v.id.videoId===videoId);
-    if(!video) return;
-    const iframe = document.createElement('iframe');
-    iframe.src=`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
-    iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-    iframe.allowFullscreen=true;
-    videoPlayer.appendChild(iframe);
-    playerInfo.innerHTML=`
-        <div class="player-title">${escapeHtml(video.snippet.title)}</div>
-        <div class="player-stats">
-            <span>${formatViewCount(video.statistics?.viewCount||'0')} переглядів</span>
-            <span>${formatTimeAgo(video.snippet.publishedAt)}</span>
-        </div>
-        <div class="player-actions">
-            <button class="action-button">👍 ${formatCount(video.statistics?.likeCount||'0')}</button>
-            <button class="action-button">👎 Не подобається (В Розробці)</button>
-            <button class="action-button">📤 Поділитися (В Розробці)</button>
-            <button class="action-button">💾 Зберегти (В Розробці)</button>
-        </div>
-        <div class="player-description">
-            <strong>${escapeHtml(video.snippet.channelTitle)}</strong><br>
-            ${escapeHtml(video.snippet.description||'')}
-        </div>`;
-    videoModal.classList.add('active'); document.body.style.overflow='hidden';
+  videoPlayer.innerHTML=''; playerInfo.innerHTML='';
+  const video = currentVideos.find(v=>v.id.videoId===videoId);
+  if(!video) return;
+  const iframe = document.createElement('iframe');
+  iframe.src=`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+  iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+  iframe.allowFullscreen=true;
+  videoPlayer.appendChild(iframe);
+  playerInfo.innerHTML = `<div class="player-title">${escapeHtml(video.snippet.title)}</div>`;
+  videoModal.classList.add('active'); document.body.style.overflow='hidden';
 }
 
-// Close modal
-function closeVideoPlayer(){
-    videoModal.classList.remove('active'); document.body.style.overflow='auto'; videoPlayer.innerHTML='';
-}
+function closeVideoPlayer(){ videoModal.classList.remove('active'); document.body.style.overflow='auto'; videoPlayer.innerHTML=''; }
 
-// Alert modal
-function showAlertModal(message){
-    const modal = document.createElement('div');
-    modal.className='video-modal';
-    modal.innerHTML=`
-      <div class="video-player-container" style="max-width:400px;padding:24px;text-align:center;">
-        <button class="close-button">✕</button>
-        <p style="font-size:16px;line-height:1.6;">${message}</p>
-      </div>`;
-    document.body.appendChild(modal);
-    modal.classList.add('active'); document.body.style.overflow='hidden';
-    modal.querySelector('.close-button').addEventListener('click',()=>{ modal.remove(); document.body.style.overflow='auto'; });
-    modal.addEventListener('click',e=>{ if(e.target===modal){ modal.remove(); document.body.style.overflow='auto'; } });
-}
-
-// Category
 function handleCategoryClick(category){
-    if(category==='Популярне'){ loadPopularVideos(); return; }
-    let filtered=[...sampleVideos];
-    if(category!=='Усі') filtered=filtered.filter(v=>v.snippet.title.toLowerCase().includes(category.toLowerCase()));
-    displayVideos(filtered);
+  if(category==='Популярне'){ loadPopularVideos(); return; }
+  let filtered=[...sampleVideos];
+  if(category!=='Усі') filtered=filtered.filter(v=>v.snippet.title.toLowerCase().includes(category.toLowerCase()));
+  displayVideos(filtered);
 }
 
-// Helpers
 function formatViewCount(v){ const c=parseInt(v||'0',10); if(c>=1e6)return (c/1e6).toFixed(1)+'M'; if(c>=1e3)return (c/1e3).toFixed(1)+'K'; return c.toString(); }
-function formatCount(c){ return formatViewCount(c); }
 function formatTimeAgo(dateStr){ if(!dateStr) return ''; const diff=Math.floor((Date.now()-new Date(dateStr))/86400000); if(diff<30)return diff+' днів тому'; if(diff<365)return Math.floor(diff/30)+' місяців тому'; return Math.floor(diff/365)+' років тому'; }
 function escapeHtml(str){ if(!str) return ''; return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+
 </script>
 </body>
 </html>
