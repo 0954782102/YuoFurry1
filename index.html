@@ -625,5 +625,95 @@
                 .replace(/'/g, '&#039;');
         }
     </script>
+    <!-- ====== МОДАЛЬНЕ ВІКНО ====== -->
+<div id="modalOverlay" style="
+  display:none;position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.85);z-index:2000;
+  align-items:center;justify-content:center;">
+  <div id="modalBox" style="
+    background:#1a1a1a;padding:20px;border-radius:12px;
+    max-width:90%;width:340px;text-align:center;color:#fff;
+    box-shadow:0 0 20px rgba(255,255,255,0.1);">
+    <div id="modalContent" style="margin-bottom:16px;font-size:15px;line-height:1.5;"></div>
+    <button id="closeModalBtn" style="
+      background:#ff4b4b;color:#fff;border:none;
+      padding:8px 16px;border-radius:6px;cursor:pointer;
+      font-weight:bold;">Закрити</button>
+  </div>
+</div>
+
+<script>
+// ====== ФУНКЦІЯ АВТОПОШУКУ ======
+function autoSearch(query) {
+  const input = document.getElementById('searchInput');
+  const button = document.getElementById('searchButton');
+  if (input && button) {
+    input.value = query;
+    button.click();
+  }
+}
+
+// ====== МОДАЛЬНЕ ВІКНО ======
+const modalOverlay = document.getElementById('modalOverlay');
+const modalContent = document.getElementById('modalContent');
+const closeModalBtn = document.getElementById('closeModalBtn');
+
+function openModal(text) {
+  modalContent.textContent = text;
+  modalOverlay.style.display = 'flex';
+}
+
+closeModalBtn.addEventListener('click', () => {
+  modalOverlay.style.display = 'none';
+});
+modalOverlay.addEventListener('click', (e) => {
+  if (e.target === modalOverlay) modalOverlay.style.display = 'none';
+});
+
+// ====== ДІЇ ДЛЯ МЕНЮ ======
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.nav-item').forEach(item => {
+    const text = item.textContent.trim();
+
+    // 🔥 Тренди
+    if (text.includes('Тренди')) {
+      item.addEventListener('click', () => autoSearch('Тренди цього року'));
+    }
+
+    // 📺 Підписки
+    if (text.includes('Підписки')) {
+      item.addEventListener('click', () => {
+        openModal('Щоб переглянути підписки, потрібно мати акаунт. Ця функція у розробці.');
+      });
+    }
+
+    // 🎵 Музика
+    if (text.includes('Музика')) {
+      item.addEventListener('click', () => autoSearch('Музика'));
+    }
+
+    // 🎮 Ігри
+    if (text.includes('Ігри')) {
+      item.addEventListener('click', () => autoSearch('Ігри'));
+    }
+
+    // ⚽ Спорт
+    if (text.includes('Спорт')) {
+      item.addEventListener('click', () => autoSearch('Спорт'));
+    }
+
+    // 📚 Навчання (якщо додаси)
+    if (text.includes('Навчання')) {
+      item.addEventListener('click', () => autoSearch('Навчальні відео'));
+    }
+
+    // 👤 Про творця
+    if (text.includes('Артем Процко')) {
+      item.addEventListener('click', () => {
+        openModal('👤 Артем Процко Андрійович — молодий розробник і творець проєкту YouFurry, який є аналогом YouTube, але з власним стилем, дизайном і сучасними можливостями.');
+      });
+    }
+  });
+});
 </body>
 </html>
