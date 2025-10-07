@@ -1,629 +1,495 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YutFurry - YouTube клієнт</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f0f0f;
-            color: #ffffff;
-            line-height: 1.5;
-            -webkit-font-smoothing:antialiased;
-            -moz-osx-font-smoothing:grayscale;
-        }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>YouFurry — відео для душі</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23ff6b6b'/%3E%3Ctext x='50' y='57' font-size='36' text-anchor='middle' fill='white' font-family='Arial'%3EYF%3C/text%3E%3C/svg%3E">
+<style>
+  /* --- Reset + base --- */
+  :root{
+    --bg:#0f0f11; --card:#141416; --muted:#9aa0a6; --accent:#ff5252; --glass: rgba(255,255,255,0.03);
+    --radius:14px; --container-w:1100px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Inter, Roboto, Arial, sans-serif;
+    background: linear-gradient(180deg,#07070a 0%, #0e0e11 100%);
+    color:#e6eef3;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    display:flex;flex-direction:column;align-items:center;
+  }
+  .app{
+    width:100%; max-width:var(--container-w); padding:18px; display:flex; flex-direction:column; gap:18px;
+  }
 
-        /* layout */
-        .container { display: flex; min-height: 100vh; }
+  /* --- Top header and "button bar" moved to top --- */
+  header{
+    display:flex; align-items:center; gap:14px; justify-content:space-between;
+  }
+  .brand{
+    display:flex; gap:12px; align-items:center;
+  }
+  .logo{
+    width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,#ff8a8a,#ff5252);display:flex;align-items:center;justify-content:center;font-weight:700;
+    box-shadow:0 6px 20px rgba(255,82,82,0.12);
+  }
+  .brand h1{margin:0;font-size:18px}
+  .top-buttons{
+    display:flex; gap:8px; align-items:center;
+  }
+  .btn{
+    background:var(--glass); border:1px solid rgba(255,255,255,0.04); padding:10px 12px; border-radius:12px; cursor:pointer;
+    color:var(--muted); font-weight:600; font-size:14px;
+  }
+  .btn.primary{ background:linear-gradient(90deg,var(--accent),#ff8a8a); color:white; border:none; box-shadow:0 8px 24px rgba(255,82,82,0.14); }
 
-        /* Sidebar */
-        .sidebar {
-            width: 240px;
-            background-color: #0f0f0f;
-            padding: 12px;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            border-right: 1px solid #272727;
-            transition: transform 0.25s ease;
-            z-index: 30;
-        }
+  /* --- Main layout --- */
+  .main{
+    display:grid; grid-template-columns: 320px 1fr; gap:18px; width:100%;
+  }
+  .sidebar{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:var(--radius); padding:14px; min-height:380px;
+  }
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:16px; padding:12px;
+  }
 
-        .logo { display:flex; align-items:center; padding: 0 12px; margin-bottom: 20px; }
-        .logo-icon{
-            background: linear-gradient(45deg, #ff0000, #ff6b6b);
-            color:white; width:40px;height:40px;border-radius:8px;
-            display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px;margin-right:12px;
-        }
-        .logo-text{
-            font-size:20px;font-weight:bold;
-            background:linear-gradient(45deg,#ff0000,#ff6b6b);
-            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-        }
+  /* --- Search at bottom --- */
+  .search-bar{
+    position:fixed; left:50%; transform:translateX(-50%); bottom:20px; width:calc(100% - 40px); max-width:840px;
+    display:flex; gap:12px; align-items:center; padding:12px; border-radius:28px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); box-shadow:0 10px 30px rgba(0,0,0,0.6);
+    backdrop-filter: blur(6px);
+  }
+  .search-bar input{
+    background:transparent; border:0; outline:none; color:#eaf2f6; font-size:16px; flex:1;
+  }
+  .search-bar .search-btn{padding:10px 16px; border-radius:12px; border:none; cursor:pointer;}
+  .search-bar .search-btn.primary{ background:var(--accent); color:white; }
 
-        .nav-section { margin-bottom: 24px; }
-        .nav-title { padding: 8px 24px; font-size:14px; color:#aaa; text-transform:uppercase; letter-spacing:0.5px; }
-        .nav-item {
-            display:flex; align-items:flex-start; gap:12px;
-            padding: 10px 24px; border-radius:12px; cursor:pointer; transition: all .2s ease; margin-bottom:6px;
-        }
-        .nav-item:hover { background:#272727; }
-        .nav-item.active { background:#272727; }
-        .nav-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; }
+  /* --- Video grid --- */
+  .videos{ display:grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap:16px; align-items:start;}
+  .video{
+    border-radius:12px; overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+    cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .video:hover{ transform:translateY(-6px); box-shadow:0 20px 40px rgba(2,6,23,0.6); }
+  .thumb{ width:100%; aspect-ratio:16/9; object-fit:cover; display:block; }
+  .meta{ padding:10px; }
+  .meta h3{ margin:0 0 6px 0; font-size:15px; color:#eaf2f6; }
+  .meta p{ margin:0; font-size:13px; color:var(--muted); }
 
-        /* main content */
-        .main-content { flex:1; margin-left:240px; padding: 20px 16px 120px 16px; } /* bottom padding for mobile bottom nav */
+  /* --- Player modal --- */
+  .player-modal{
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.6); z-index:1200;
+  }
+  .player-modal.show{ display:flex; }
+  .player-card{ width:90%; max-width:1100px; background:var(--card); border-radius:16px; padding:12px; }
+  .player-card iframe{ width:100%; height:60vh; border:0; border-radius:8px; }
 
-        /* search */
-        .top-search {
-            display:none; /* shown on mobile */
-            position:fixed;
-            top:0; left:0; right:0;
-            height:56px;
-            background:#0f0f0f; border-bottom:1px solid #272727;
-            z-index:40;
-            display:flex; align-items:center; gap:12px; padding:8px 12px;
-        }
-        .top-search .logo-icon-small{ width:36px; height:36px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:16px; }
-        .search-container {
-            display:flex; align-items:center; background:#272727; border-radius:24px; padding:8px 12px; max-width:720px; width:100%;
-        }
-        .search-input { flex:1; background:transparent; border:none; color:white; font-size:16px; padding:6px 8px; outline:none; }
-        .search-button { background:#373737; border:none; color:white; padding:8px 12px; border-radius:20px; cursor:pointer; }
+  /* --- Modal styles (consent/warning/register) --- */
+  .modal{
+    position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.6); z-index:1300;
+  }
+  .modal.show{ display:flex; }
+  .modal .dialog{
+    width:92%; max-width:920px; max-height:88vh; overflow:auto; background:linear-gradient(180deg,#0b0b0d,#101014); border-radius:20px; padding:22px; box-shadow:0 30px 80px rgba(0,0,0,0.7);
+  }
+  .modal h2{ margin:0 0 12px 0; font-size:20px; color:#fff}
+  .modal p{ color:var(--muted); line-height:1.5; white-space:pre-wrap; }
 
-        /* categories */
-        .categories { display:flex; gap:12px; margin:16px 0 20px 0; flex-wrap:nowrap; overflow-x:auto; padding-bottom:6px; }
-        .category { background:#373737; padding:8px 14px; border-radius:20px; cursor:pointer; font-size:14px; white-space:nowrap; }
-        .category.active { background:white; color:black; }
+  .modal .actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:16px; }
 
-        /* video grid (desktop) */
-        .video-grid {
-            display:grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px,1fr));
-            gap:20px;
-            margin-bottom:40px;
-        }
-        .video-card {
-            background:#1a1a1a; border-radius:12px; overflow:hidden; transition: transform .25s, box-shadow .25s; cursor:pointer;
-        }
-        .video-card:hover{ transform:translateY(-4px); box-shadow:0 8px 24px rgba(255,255,255,0.03); }
-        .thumbnail { width:100%; height:180px; background:#373737; position:relative; overflow:hidden; }
-        .thumbnail img{ width:100%; height:100%; object-fit:cover; display:block; }
-        .duration { position:absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.8); padding:2px 6px; border-radius:4px; font-size:12px; }
-
-        .video-info { padding:12px; }
-        .video-title { font-weight:600; margin-bottom:8px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-        .channel-info { display:flex; align-items:center; margin-bottom:4px; gap:12px; }
-        .channel-avatar { width:36px; height:36px; border-radius:50%; background:#373737; overflow:hidden; flex-shrink:0; }
-        .channel-avatar img{ width:100%; height:100%; object-fit:cover; }
-        .channel-name{ color:#aaa; font-size:14px; }
-        .video-stats{ color:#aaa; font-size:14px; margin-left:48px; }
-
-        /* modal */
-        .video-modal {
-            position:fixed; top:0; left:0; right:0; bottom:0;
-            background:rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index:1000; padding:16px;
-        }
-        .video-modal.active{ display:flex; }
-        .video-player-container { width:100%; max-width:1100px; background:#1a1a1a; border-radius:12px; overflow:hidden; position:relative; }
-        .close-button { position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.7); border:none; color:white; width:40px; height:40px; border-radius:50%; cursor:pointer; z-index:10; font-size:20px; display:flex; align-items:center; justify-content:center; }
-        .video-player { width:100%; height:0; padding-bottom:56.25%; position:relative; }
-        .video-player iframe{ position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
-        .player-info { padding:16px; }
-        .player-title{ font-size:18px; font-weight:600; margin-bottom:8px; }
-        .player-stats{ display:flex; justify-content:space-between; color:#aaa; font-size:13px; margin-bottom:12px; }
-        .player-actions{ display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
-        .action-button{ background:#373737; border:none; color:white; padding:8px 12px; border-radius:20px; cursor:pointer; display:flex; align-items:center; gap:8px; }
-
-        .player-description{ background:#272727; padding:12px; border-radius:8px; font-size:14px; line-height:1.4; }
-
-        .loading { text-align:center; padding:40px; color:#aaa; }
-
-        /* ------------ MOBILE SPECIFIC ------------ */
-        @media (max-width: 900px) {
-            /* make sidebar compact */
-            .sidebar { width:72px; }
-            .main-content { margin-left:72px; padding-top:76px; padding-bottom:120px; } /* top padding for mobile top search */
-            .nav-title, .nav-text { display:none; }
-            .nav-item { justify-content:center; padding:12px; }
-            .nav-icon { margin-right:0; }
-        }
-
-        @media (max-width: 768px) {
-            /* hide sidebar fully (like mobile app that uses top/bottom nav) */
-            .sidebar { transform: translateX(-110%); position:fixed; left:0; top:0; bottom:0; z-index:30; }
-            .main-content { margin-left:0; padding-top:76px; padding-left:12px; padding-right:12px; }
-
-            /* show mobile top search bar */
-            .top-search { display:flex; }
-
-            /* video list like YouTube mobile */
-            .video-grid {
-                display:flex;
-                flex-direction:column;
-                gap:10px;
-            }
-            .video-card {
-                display:flex;
-                gap:12px;
-                align-items:flex-start;
-                border-radius:0;
-                background:transparent;
-                padding:0;
-            }
-            .thumbnail { width:40%; height:120px; border-radius:8px; flex-shrink:0; }
-            .video-info { padding:0; width:60%; }
-            .video-title { font-size:15px; display:-webkit-box; -webkit-line-clamp:2; }
-            .channel-info { margin-top:8px; gap:8px; }
-            .channel-name{ font-size:13px; color:#bbb; }
-            .video-stats{ font-size:12px; color:#888; margin-left:0; }
-
-            /* adjust modal to be full screen */
-            .video-player-container { border-radius:8px; height:100vh; max-width:100%; display:flex; flex-direction:column; }
-            .video-player { padding-bottom:56.25%; height:auto; }
-            .player-info { overflow:auto; max-height:40vh; padding-bottom:80px; }
-
-            /* bottom nav */
-            .bottom-nav {
-                position:fixed; left:0; right:0; bottom:0; height:56px; background:#0f0f0f; border-top:1px solid #272727; display:flex; z-index:50;
-                justify-content:space-around; align-items:center; gap:6px;
-            }
-            .bottom-nav .nav-item-mobile { display:flex; flex-direction:column; align-items:center; justify-content:center; color:#bbb; font-size:11px; gap:4px; text-decoration:none; }
-            .bottom-nav .nav-item-mobile.active { color:white; }
-        }
-
-        /* small tweaks for very small screens */
-        @media (max-width: 420px) {
-            .thumbnail { height:110px; }
-            .video-card { gap:10px; }
-            .player-title { font-size:16px; }
-            .search-input { font-size:15px; }
-        }
-    </style>
+  /* --- small helpers --- */
+  .muted{ color:var(--muted); font-size:13px }
+  .flex{ display:flex; gap:10px; align-items:center }
+  .form-input{ background:transparent; border:1px solid rgba(255,255,255,0.04); padding:10px; border-radius:10px; color:#eaf2f6; width:100% }
+  footer{ padding:14px; color:var(--muted); font-size:13px; text-align:center }
+  @media(max-width:880px){
+    .main{ grid-template-columns: 1fr; }
+    .sidebar{ order:2; }
+  }
+</style>
 </head>
 <body>
-    <!-- Mobile top bar (visible on small screens) -->
-    <div class="top-search" id="topSearchBar" style="display:none;">
-        <div class="logo-icon-small" style="background:linear-gradient(45deg,#ff0000,#ff6b6b);">
-            YF
-        </div>
-        <div style="flex:1;">
-            <div class="search-container" style="width:100%;">
-                <input type="text" class="search-input" placeholder="Пошук відео..." id="searchInputMobile" aria-label="Пошук відео">
-                <button class="search-button" id="searchButtonMobile">Пошук</button>
-            </div>
-        </div>
-        <div style="width:36px; text-align:center; color:#bbb;">☰</div>
+<div class="app" id="app">
+  <header>
+    <div class="brand">
+      <div class="logo">YF</div>
+      <div>
+        <h1>YouFurry</h1>
+        <div class="muted">Відеоплатформа тестового формату</div>
+      </div>
     </div>
 
-    <div class="container">
-        <!-- Sidebar Navigation -->
-        <div class="sidebar" id="sidebar">
-            <div class="logo">
-                <div class="logo-icon">YF</div>
-                <div class="logo-text">YutFurry</div>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-item active">
-                    <div class="nav-icon">🏠</div>
-                    <div class="nav-text">Головна</div>
-                </div>
-                <div class="nav-item">
-                    <div class="nav-icon">🔥</div>
-                    <div class="nav-text">Тренди(В розробці)</div>
-                </div>
-                <div class="nav-item">
-                    <div class="nav-icon">📺</div>
-                    <div class="nav-text">Підписки(В розробці)</div>
-                </div>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-title">НАВІГАЦІЯ(Не доступно)</div>
-                <div class="nav-item">
-                    <div class="nav-icon">🎵</div>
-                    <div class="nav-text">Музика</div>
-                </div>
-                <div class="nav-item">
-                    <div class="nav-icon">🎮</div>
-                    <div class="nav-text">Ігри</div>
-                </div>
-                <div class="nav-item">
-                    <div class="nav-icon">⚽</div>
-                    <div class="nav-text">Спорт</div>
-                </div>
-            </div>
-
-            <div class="nav-section">
-                <div class="nav-title">ПРО ТВОРЦЯ</div>
-                <div class="nav-item">
-                    <div class="nav-icon">👤</div>
-                    <div class="nav-text">Артем Процко Андрійович — молодий розробник і творець проєкту YouFurry, який є аналогом YouTube, але з власним стилем, дизайном і сучасними можливостями.</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content" id="mainContent">
-            <!-- Desktop search (kept for larger screens) -->
-            <div class="search-container" style="max-width:720px; display:flex; margin-bottom:12px;">
-                <input type="text" class="search-input" placeholder="Пошук відео..." id="searchInput" aria-label="Пошук відео">
-                <button class="search-button" id="searchButton">Пошук</button>
-            </div>
-
-            <!-- Categories -->
-            <div class="categories" id="categories">
-                <div class="category active">Усі</div>
-                <div class="category">Популярне</div>
-                <div class="category">Музика</div>
-                <div class="category">Ігри</div>
-                <div class="category">Фільми</div>
-                <div class="category">Живі трансляції</div>
-                <div class="category">Навчання</div>
-            </div>
-
-            <!-- Video Grid -->
-            <div class="video-grid" id="videoGrid">
-                <div class="loading">Завантаження популярних відео...</div>
-            </div>
-        </div>
-
-        <!-- Video Player Modal -->
-        <div class="video-modal" id="videoModal">
-            <div class="video-player-container" role="dialog" aria-modal="true">
-                <button class="close-button" id="closeButton">✕</button>
-                <div class="video-player" id="videoPlayer">
-                    <!-- iframe -->
-                </div>
-                <div class="player-info" id="playerInfo">
-                    <!-- info -->
-                </div>
-            </div>
-        </div>
+    <div class="top-buttons">
+      <button class="btn" id="homeBtn">Головна</button>
+      <button class="btn" id="subscriptionsBtn">Підписки</button>
+      <button class="btn" id="libraryBtn">Бібліотека</button>
+      <button class="btn primary" id="uploadBtn">Завантажити</button>
+      <button class="btn" id="authBtn">Увійти / Реєстрація</button>
     </div>
+  </header>
 
-    <!-- Bottom navigation for mobile -->
-    <nav class="bottom-nav" id="bottomNav" style="display:none;">
-        <a class="nav-item-mobile active" href="#" id="navHome"><div>🏠</div><div>Головна</div></a>
-        <a class="nav-item-mobile" href="#" id="navTrending"><div>🔥</div><div>Тренди</div></a>
-        <a class="nav-item-mobile" href="#" id="navSubscriptions"><div>📺</div><div>Підписки</div></a>
-        <a class="nav-item-mobile" href="#" id="navLibrary"><div>📁</div><div>Бібліотека</div></a>
-        <a class="nav-item-mobile" href="#" id="navProfile"><div>👤</div><div>Кабінет</div></a>
-    </nav>
+  <main class="main">
+    <aside class="sidebar card">
+      <h3>Навігація</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+        <button class="btn">Дивитися пізніше</button>
+        <button class="btn">Підписки</button>
+        <button class="btn">Тренди</button>
+        <button class="btn">Налаштування</button>
+      </div>
+      <hr style="margin:12px 0; border:none; border-top:1px solid rgba(255,255,255,0.03)" />
+      <div class="muted">Рекомендації</div>
+      <div id="recommendations" style="margin-top:10px; display:flex; flex-direction:column; gap:8px"></div>
+    </aside>
 
-    <script>
-        // YouTube API configuration (залишив як було)
-        const API_KEY = 'AIzaSyBVqXcayVNDN63l4WpH2HOrTfAqzh3DTXo';
-        let currentVideos = [];
+    <section>
+      <div class="card" style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center">
+        <div>
+          <h2 style="margin:0">Рекомендовані відео</h2>
+          <div class="muted">Пошук, відтворення та базова рекомендована стрічка</div>
+        </div>
+        <div class="muted">Вхід: <span id="userLabel">анонім</span></div>
+      </div>
 
-        // Elements
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
-        const videoGrid = document.getElementById('videoGrid');
-        const videoModal = document.getElementById('videoModal');
-        const videoPlayer = document.getElementById('videoPlayer');
-        const playerInfo = document.getElementById('playerInfo');
-        const closeButton = document.getElementById('closeButton');
+      <div id="videoGrid" class="videos"></div>
+    </section>
+  </main>
 
-        // Mobile-specific elements
-        const topSearchBar = document.getElementById('topSearchBar');
-        const searchInputMobile = document.getElementById('searchInputMobile');
-        const searchButtonMobile = document.getElementById('searchButtonMobile');
-        const bottomNav = document.getElementById('bottomNav');
+  <!-- Search at bottom -->
+  <div class="search-bar" role="search" aria-label="Пошук відео">
+    <input id="searchInput" placeholder="Пошук відео, каналів, тем..." />
+    <button class="search-btn" id="voiceBtn" title="Голосовий пошук (поки що заглушка)">🎤</button>
+    <button class="search-btn primary" id="searchBtn">Пошук</button>
+  </div>
 
-        // Sample videos kept as fallback (не змінив)
-        const sampleVideos = [
-            {
-                id: { videoId: 'dQw4w9WgXcQ' },
-                snippet: {
-                    title: 'Never Gonna Give You Up - Rick Astley',
-                    description: 'Official video for Rick Astley - Never Gonna Give You Up',
-                    channelTitle: 'Rick Astley',
-                    publishedAt: '2009-10-25T06:57:33Z',
-                    thumbnails: {
-                        medium: { url: 'https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg' }
-                    }
-                },
-                statistics: {
-                    viewCount: '1500000000',
-                    likeCount: '12000000'
-                }
-            },
-            {
-                id: { videoId: 'kJQP7kiw5Fk' },
-                snippet: {
-                    title: 'Despacito ft. Daddy Yankee',
-                    description: 'Luis Fonsi - Despacito ft. Daddy Yankee',
-                    channelTitle: 'Luis Fonsi',
-                    publishedAt: '2017-01-13T04:59:31Z',
-                    thumbnails: {
-                        medium: { url: 'https://img.youtube.com/vi/kJQP7kiw5Fk/mqdefault.jpg' }
-                    }
-                },
-                statistics: {
-                    viewCount: '8000000000',
-                    likeCount: '50000000'
-                }
-            },
-            {
-                id: { videoId: '9bZkp7q19f0' },
-                snippet: {
-                    title: 'PSY - GANGNAM STYLE',
-                    description: 'PSY - GANGNAM STYLE M/V',
-                    channelTitle: 'officialpsy',
-                    publishedAt: '2012-07-15T07:46:32Z',
-                    thumbnails: {
-                        medium: { url: 'https://img.youtube.com/vi/9bZkp7q19f0/mqdefault.jpg' }
-                    }
-                },
-                statistics: {
-                    viewCount: '4500000000',
-                    likeCount: '23000000'
-                }
-            }
-        ];
+  <footer>© YouFurry — експериментальний інтерфейс • Не зберігаємо відео локально</footer>
+</div>
 
-        // Init
-        document.addEventListener('DOMContentLoaded', function() {
-            // show/hide mobile UI based on screen width
-            handleResponsiveUI();
-            window.addEventListener('resize', handleResponsiveUI);
+<!-- Player modal -->
+<div id="playerModal" class="player-modal" aria-hidden="true">
+  <div class="player-card card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong id="playerTitle">Відтворення</strong>
+      <div><button class="btn" id="closePlayer">Закрити</button></div>
+    </div>
+    <iframe id="playerFrame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+</div>
 
-            // Load popular videos
-            loadPopularVideos();
+<!-- Consent modal (big text) -->
+<div id="consentModal" class="modal" role="dialog" aria-modal="true">
+  <div class="dialog">
+    <h2>Угода користувача — YouFurry (тестова)</h2>
+    <p>
+      Шановний(-а) користувачу! Дякуємо за інтерес до YouFurry — експериментальної платформи для перегляду та пошуку відео.
+      Перед тим як продовжити, будь ласка, уважно ознайомтеся з цією угодою. Використовуючи додаток YouFurry, ви погоджуєтесь з умовами нижче.
+      
+      1) Суть послуги: YouFurry надається як тестовий інтерфейс для пошуку та перегляду відео через відкриті API. Деякі функції — чернетки або прототипи.
+      
+      2) Відповідальність: Розробники не несуть відповідальності за точність контенту, технічні збої, втрату даних або інші несправності. Ви берете на себе ризики використання програмного продукту в поточному вигляді.
+      
+      3) Конфіденційність: Для роботи може використовуватись локальне збереження даних (localStorage) для зручності — наприклад, налаштування та тестові облікові дані. Чутливі дані не передаються на зовнішні сервери цим прототипом (за винятком запитів до YouTube API).
+      
+      4) API-ключ: Додавши API-ключ для пошуку, ви погоджуєтесь з тим, що використання ключа підпорядковується правилам постачальника API. Будь ласка, уникайте розповсюдження ключа в публічних репозиторіях.
+      
+      5) Правила використання контенту: Весь відеоконтент належить правовласникам. YouFurry надає лише інтерфейс доступу до метаданих та вбудованого програвача.
+      
+      6) Зміни: Ця тестова угода може оновлюватися без попереднього повідомлення з метою розвитку продукту.
+      
+      Натиснувши "Я згоден(на)", ви підтверджуєте, що прочитали та погоджуєтесь з цими умовами.
+    </p>
+    <div class="actions">
+      <button class="btn" id="consentDecline">Відмовити</button>
+      <button class="btn primary" id="consentAccept">Я згоден(на)</button>
+    </div>
+  </div>
+</div>
 
-            // Event listeners
-            searchButton.addEventListener('click', handleSearch);
-            searchInput.addEventListener('keypress', function(e){ if (e.key === 'Enter') handleSearch(); });
+<!-- Warning modal -->
+<div id="warningModal" class="modal" role="dialog" aria-modal="true">
+  <div class="dialog">
+    <h2>Увага — тестова версія</h2>
+    <p>
+      Зверніть увагу: YouFurry знаходиться у стадії тестування. Деякі функції можуть поводитись некоректно або бути тимчасово відключені.
+      Можливі затримки при пошуку відео, помилки при відтворенні, а також обмеження API (кількість запитів).
+      Якщо ви натрапите на помилку — будь ласка, зафіксуйте її у консоль браузера або збережіть ID та надішліть розробнику.
+    </p>
+    <div class="actions">
+      <button class="btn primary" id="warningOk">Розумію</button>
+    </div>
+  </div>
+</div>
 
-            // mobile search
-            if (searchButtonMobile) {
-                searchButtonMobile.addEventListener('click', function(){
-                    const q = (searchInputMobile.value || '').trim();
-                    if (!q) return;
-                    searchInput.value = q; // mirror to desktop input for logic reuse
-                    handleSearch();
-                });
-                searchInputMobile.addEventListener('keypress', function(e){ if (e.key==='Enter') searchButtonMobile.click(); });
-            }
+<!-- Register / Login modal -->
+<div id="authModal" class="modal" role="dialog" aria-modal="true">
+  <div class="dialog" style="max-width:520px">
+    <h2>Реєстрація / Вхід</h2>
+    <p class="muted">Це локальна (тестова) форма — дані зберігаються у вашому браузері (localStorage).</p>
+    <div style="display:grid;gap:8px;margin-top:10px">
+      <input id="authEmail" class="form-input" placeholder="Email або ім'я" />
+      <input id="authPwd" class="form-input" placeholder="Пароль" type="password" />
+      <div style="display:flex;gap:8px">
+        <button class="btn primary" id="registerBtn">Зареєструватись</button>
+        <button class="btn" id="loginBtn">Увійти</button>
+        <button class="btn" id="closeAuth">Закрити</button>
+      </div>
+      <div id="authInfo" class="muted"></div>
+    </div>
+  </div>
+</div>
 
-            closeButton.addEventListener('click', closeVideoPlayer);
+<script>
+/*
+  YouFurry — single-file prototype
+  - YouTube Data API v3 search endpoints used (key below)
+  - Local storage flags:
+      youfurry_consent_accepted
+      youfurry_seen_warning
+      youfurry_user   -> {name,email}
+  - This is a prototype: do not store real passwords here.
+*/
 
-            document.querySelectorAll('.category').forEach(category => {
-                category.addEventListener('click', function(){
-                    document.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
-                    this.classList.add('active');
-                    handleCategoryClick(this.textContent);
-                });
-            });
+// ====== CONFIG ======
+const YOUTUBE_API_KEY = 'AIzaSyBVqXcayVNDN63l4WpH2HOrTfAqzh3DTXo'; // твоє значення
+const YOUTUBE_SEARCH_API = 'https://www.googleapis.com/youtube/v3/search';
+const YOUTUBE_VIDEOS_API = 'https://www.googleapis.com/youtube/v3/videos';
 
-            // bottom nav clicks (just visual)
-            document.querySelectorAll('.bottom-nav .nav-item-mobile').forEach(item => {
-                item.addEventListener('click', function(e){
-                    e.preventDefault();
-                    document.querySelectorAll('.bottom-nav .nav-item-mobile').forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-        });
+// ====== UI refs ======
+const consentModal = document.getElementById('consentModal');
+const warningModal = document.getElementById('warningModal');
+const authModal = document.getElementById('authModal');
+const playerModal = document.getElementById('playerModal');
+const playerFrame = document.getElementById('playerFrame');
+const playerTitle = document.getElementById('playerTitle');
 
-        function handleResponsiveUI(){
-            const w = window.innerWidth;
-            if (w <= 768) {
-                // show mobile top search and bottom nav
-                topSearchBar.style.display = 'flex';
-                bottomNav.style.display = 'flex';
-                document.getElementById('mainContent').style.paddingTop = '76px';
-            } else {
-                topSearchBar.style.display = 'none';
-                bottomNav.style.display = 'none';
-                document.getElementById('mainContent').style.paddingTop = '20px';
-            }
-        }
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+const videoGrid = document.getElementById('videoGrid');
+const recommendationsEl = document.getElementById('recommendations');
+const userLabel = document.getElementById('userLabel');
+const authBtn = document.getElementById('authBtn');
 
-        // Search function (збережена логіка, трохи адаптована)
-        async function handleSearch() {
-            const query = (searchInput.value || '').trim();
-            if (!query) return;
+// ====== On load: show modals in sequence if not accepted ======
+window.addEventListener('load', () => {
+  const accepted = localStorage.getItem('youfurry_consent_accepted');
+  if (!accepted) {
+    showModal(consentModal);
+  } else {
+    const warned = localStorage.getItem('youfurry_seen_warning');
+    if (!warned) showModal(warningModal);
+  }
+  loadUserFromStorage();
+  fetchRecommendations(); // initial recommendation load
+  fetchPopular(); // additional grid load
+});
 
-            videoGrid.innerHTML = '<div class="loading">Завантаження...</div>';
+// ====== Modal helpers ======
+function showModal(el){ el.classList.add('show'); el.setAttribute('aria-hidden','false'); }
+function hideModal(el){ el.classList.remove('show'); el.setAttribute('aria-hidden','true'); }
 
-            try {
-                const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`);
-                const data = await response.json();
+// Consent modal actions
+document.getElementById('consentAccept').addEventListener('click', () => {
+  localStorage.setItem('youfurry_consent_accepted','1');
+  hideModal(consentModal);
+  showModal(warningModal);
+});
+document.getElementById('consentDecline').addEventListener('click', () => {
+  // If declined — keep them but do not allow further usage: we will hide app controls
+  alert('Ви відхилили угоду — доступ до застосунку обмежено.');
+  document.getElementById('app').style.filter = 'blur(4px) grayscale(.6)';
+  hideModal(consentModal);
+});
 
-                if (data.items && data.items.length > 0) {
-                    const videoIds = data.items.map(item => item.id.videoId).join(',');
-                    const statsResponse = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds}&key=${API_KEY}`);
-                    const statsData = await statsResponse.json();
+// Warning modal action
+document.getElementById('warningOk').addEventListener('click', () => {
+  localStorage.setItem('youfurry_seen_warning','1');
+  hideModal(warningModal);
+});
 
-                    const videosWithStats = data.items.map((item, index) => ({
-                        ...item,
-                        statistics: statsData.items[index]?.statistics || { viewCount:'0', likeCount:'0' }
-                    }));
+// ====== Auth modal actions (simple localStorage) ======
+document.getElementById('registerBtn').addEventListener('click', () => {
+  const name = document.getElementById('authEmail').value.trim();
+  const pwd = document.getElementById('authPwd').value;
+  const info = document.getElementById('authInfo');
+  if (!name || !pwd) { info.textContent = 'Введіть email/ім’я та пароль.'; return; }
+  // Save simple "user"
+  const user = { name, pwd };
+  localStorage.setItem('youfurry_user', JSON.stringify(user));
+  info.textContent = 'Зареєстровано локально. Ви увійшли.';
+  updateUserLabel(user);
+  setTimeout(()=> hideModal(authModal), 800);
+});
+document.getElementById('loginBtn').addEventListener('click', () => {
+  const name = document.getElementById('authEmail').value.trim();
+  const pwd = document.getElementById('authPwd').value;
+  const info = document.getElementById('authInfo');
+  const raw = localStorage.getItem('youfurry_user');
+  if (!raw) { info.textContent = 'Користувач не знайдений. Зареєструйтеся.'; return; }
+  const saved = JSON.parse(raw);
+  if (saved.name === name && saved.pwd === pwd) {
+    info.textContent = 'Ласкаво просимо назад!';
+    updateUserLabel(saved);
+    setTimeout(()=> hideModal(authModal), 700);
+  } else info.textContent = 'Невірні облікові дані.';
+});
+document.getElementById('closeAuth').addEventListener('click', ()=> hideModal(authModal));
+document.getElementById('authBtn').addEventListener('click', ()=> showModal(authModal));
 
-                    displayVideos(videosWithStats);
-                } else {
-                    const filteredVideos = sampleVideos.filter(video =>
-                        video.snippet.title.toLowerCase().includes(query.toLowerCase())
-                    );
-                    if (filteredVideos.length > 0) displayVideos(filteredVideos);
-                    else videoGrid.innerHTML = '<div class="loading">Відео не знайдено. Спробуйте інший запит.</div>';
-                }
-            } catch (error) {
-                console.error('Search error:', error);
-                const filteredVideos = sampleVideos.filter(video =>
-                    video.snippet.title.toLowerCase().includes(query.toLowerCase())
-                );
-                if (filteredVideos.length > 0) displayVideos(filteredVideos);
-                else videoGrid.innerHTML = '<div class="loading">Помилка пошуку. Спробуйте ще раз.</div>';
-            }
-        }
+function loadUserFromStorage(){
+  const raw = localStorage.getItem('youfurry_user');
+  if (raw) {
+    try{
+      const user = JSON.parse(raw);
+      updateUserLabel(user);
+    }catch(e){}
+  }
+}
+function updateUserLabel(user){
+  if (!user) userLabel.textContent = 'анонім';
+  else userLabel.textContent = user.name || 'користувач';
+}
 
-        // Load popular (логіка такий самий)
-        async function loadPopularVideos() {
-            videoGrid.innerHTML = '<div class="loading">Завантаження популярних відео...</div>';
-            try {
-                const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&maxResults=12&regionCode=UA&key=${API_KEY}`);
-                const data = await response.json();
-                if (data.items && data.items.length > 0) {
-                    const popularVideos = data.items.map(item => ({
-                        id: { videoId: item.id },
-                        snippet: item.snippet,
-                        statistics: item.statistics
-                    }));
-                    displayVideos(popularVideos);
-                } else {
-                    displayVideos(sampleVideos);
-                }
-            } catch (error) {
-                console.error('Error loading popular videos:', error);
-                displayVideos(sampleVideos);
-            }
-        }
+// ====== Player controls ======
+document.getElementById('closePlayer').addEventListener('click', () => {
+  playerFrame.src = '';
+  hideModal(playerModal);
+});
 
-        function handleCategoryClick(category) {
-            videoGrid.innerHTML = '<div class="loading">Завантаження...</div>';
-            if (category === 'Популярне') {
-                loadPopularVideos(); return;
-            }
-            setTimeout(() => {
-                let filteredVideos = [...sampleVideos];
-                if (category !== 'Усі') {
-                    filteredVideos = filteredVideos.filter(video =>
-                        video.snippet.title.toLowerCase().includes(category.toLowerCase())
-                    );
-                }
-                displayVideos(filteredVideos);
-            }, 300);
-        }
+// ====== Search & API helpers ======
+searchBtn.addEventListener('click', () => doSearch(searchInput.value.trim()));
+searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(searchInput.value.trim()); });
 
-        function displayVideos(videos) {
-            currentVideos = videos;
-            if (videos.length === 0) {
-                videoGrid.innerHTML = '<div class="loading">Відео не знайдено</div>'; return;
-            }
+async function doSearch(q) {
+  if (!q) return;
+  videoGrid.innerHTML = '<div class="muted">Пошук...</div>';
+  try {
+    const params = new URLSearchParams({
+      key: YOUTUBE_API_KEY,
+      part: 'snippet',
+      q,
+      maxResults: 12,
+      type: 'video',
+      safeSearch: 'moderate'
+    });
+    const url = YOUTUBE_SEARCH_API + '?' + params.toString();
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    renderVideos(data.items);
+  } catch (err) {
+    console.error(err);
+    videoGrid.innerHTML = '<div class="muted">Помилка пошуку — перевірте ключ API або мережу. Деталі в консолі.</div>';
+  }
+}
 
-            // Different markup for mobile (list) vs desktop grid is handled by CSS only:
-            videoGrid.innerHTML = videos.map(video => `
-                <div class="video-card" onclick="openVideoPlayer('${video.id.videoId}')">
-                    <div class="thumbnail">
-                        <img src="${video.snippet.thumbnails?.medium?.url || 'https://via.placeholder.com/320x180/333333/ffffff?text=Thumbnail'}" alt="${escapeHtml(video.snippet.title)}" onerror="this.src='https://via.placeholder.com/320x180/333333/ffffff?text=Thumbnail'">
-                        <div class="duration">5:30</div>
-                    </div>
-                    <div class="video-info">
-                        <div class="video-title">${escapeHtml(video.snippet.title)}</div>
-                        <div class="channel-info">
-                            <div class="channel-avatar">
-                                <img src="https://via.placeholder.com/36/373737/ffffff?text=${encodeURIComponent(video.snippet.channelTitle.charAt(0) || 'C')}" alt="${escapeHtml(video.snippet.channelTitle)}">
-                            </div>
-                            <div style="display:flex;flex-direction:column;">
-                                <div class="channel-name">${escapeHtml(video.snippet.channelTitle)}</div>
-                                <div class="video-stats">${formatViewCount(video.statistics?.viewCount || '0')} переглядів • ${formatTimeAgo(video.snippet.publishedAt)}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+function renderVideos(items){
+  if (!items || items.length === 0) { videoGrid.innerHTML = '<div class="muted">Нічого не знайдено.</div>'; return; }
+  videoGrid.innerHTML = '';
+  items.forEach(it => {
+    const vidId = it.id?.videoId || (it.id && it.id.videoId) || (it.id && it.id);
+    const thumb = it.snippet.thumbnails?.high?.url || it.snippet.thumbnails?.medium?.url || '';
+    const title = it.snippet.title;
+    const channel = it.snippet.channelTitle;
+    const el = document.createElement('div');
+    el.className = 'video';
+    el.innerHTML = `
+      <img class="thumb" src="${thumb}" loading="lazy" alt="${escapeHtml(title)}" />
+      <div class="meta">
+        <h3>${escapeHtml(shorten(title, 72))}</h3>
+        <p class="muted">${escapeHtml(channel)}</p>
+      </div>
+    `;
+    el.addEventListener('click', () => openPlayer(vidId, title));
+    videoGrid.appendChild(el);
+  });
+}
 
-            // prevent anchor default behavior
-            document.querySelectorAll('.video-card').forEach(card => {
-                card.addEventListener('click', function(e){
-                    e.preventDefault();
-                    e.stopPropagation();
-                });
-            });
-        }
+function openPlayer(videoId, title) {
+  playerFrame.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+  playerTitle.textContent = title || 'Відтворення';
+  showModal(playerModal);
+}
 
-        // Open video in modal
-        function openVideoPlayer(videoId) {
-            try {
-                event.preventDefault();
-                event.stopPropagation();
-            } catch(e){}
+// ====== Recommendations & Popular fetch ======
+async function fetchRecommendations(){
+  // Simple approach: do a search for "recommended" topics (you can refine)
+  try {
+    const params = new URLSearchParams({
+      key: YOUTUBE_API_KEY,
+      part: 'snippet',
+      q: 'тренди відео розважальне',
+      maxResults: 6,
+      type: 'video',
+    });
+    const url = YOUTUBE_SEARCH_API + '?' + params.toString();
+    const res = await fetch(url);
+    if (res.ok){
+      const data = await res.json();
+      recommendationsEl.innerHTML = '';
+      (data.items || []).forEach(it => {
+        const d = document.createElement('div');
+        d.style.display='flex'; d.style.gap='8px'; d.style.alignItems='center';
+        d.innerHTML = `<img src="${it.snippet.thumbnails?.default?.url}" style="width:64px;height:44px;border-radius:8px;object-fit:cover" />
+          <div style="flex:1"><div style="font-size:13px">${shorten(it.snippet.title,40)}</div><div class="muted" style="font-size:12px">${it.snippet.channelTitle}</div></div>`;
+        d.addEventListener('click', ()=> openPlayer(it.id.videoId, it.snippet.title));
+        recommendationsEl.appendChild(d);
+      });
+    } else {
+      recommendationsEl.innerHTML = '<div class="muted">Не вдалося завантажити рекомендації</div>';
+    }
+  } catch (e) {
+    console.error(e);
+    recommendationsEl.innerHTML = '<div class="muted">Помилка мережі при завантаженні рекомендацій</div>';
+  }
+}
 
-            videoPlayer.innerHTML = '';
-            playerInfo.innerHTML = '';
+async function fetchPopular(){
+  // Fallback: search for 'music' to fill grid initially
+  try {
+    const params = new URLSearchParams({
+      key: YOUTUBE_API_KEY,
+      part: 'snippet',
+      q: 'music',
+      maxResults: 12,
+      type: 'video'
+    });
+    const res = await fetch(YOUTUBE_SEARCH_API + '?' + params.toString());
+    const data = await res.json();
+    renderVideos(data.items);
+  } catch (e) {
+    console.error(e);
+    videoGrid.innerHTML = '<div class="muted">Не вдалося завантажити початкову стрічку.</div>';
+  }
+}
 
-            const video = currentVideos.find(v => v.id.videoId === videoId);
-            if (!video) return;
+// ====== Utilities ======
+function shorten(s,n){ if(!s) return ''; return s.length>n? s.slice(0,n-1)+'…':s; }
+function escapeHtml(s){ return s ? s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])) : ''; }
 
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
-            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-            iframe.allowFullscreen = true;
-            iframe.setAttribute('frameborder', '0');
-            iframe.style.width = '100%';
-            iframe.style.height = '100%';
-            videoPlayer.appendChild(iframe);
+// ====== Small helpers for buttons in header ----
+document.getElementById('homeBtn').addEventListener('click', () => { fetchPopular(); window.scrollTo({top:0,behavior:'smooth'}); });
+document.getElementById('uploadBtn').addEventListener('click', () => alert('Функція завантаження недоступна у тестовій версії.'));
+document.getElementById('subscriptionsBtn').addEventListener('click', () => alert('Підписки: демонстраційний розділ.'));
+document.getElementById('libraryBtn').addEventListener('click', () => alert('Бібліотека: поки порожньо.'));
 
-            playerInfo.innerHTML = `
-                <div class="player-title">${escapeHtml(video.snippet.title)}</div>
-                <div class="player-stats">
-                    <span>${formatViewCount(video.statistics?.viewCount || '0')} переглядів</span>
-                    <span>${formatTimeAgo(video.snippet.publishedAt)}</span>
-                </div>
-                <div class="player-actions">
-                    <button class="action-button">👍 ${formatCount(video.statistics?.likeCount || '0')}</button>
-                    <button class="action-button">👎 Не подобається (В Розробці)</button>
-                    <button class="action-button">📤 Поділитися (В Розробці)</button>
-                    <button class="action-button">💾 Зберегти (В Розробці)</button>
-                </div>
-                <div class="player-description">
-                    <strong>${escapeHtml(video.snippet.channelTitle)}</strong><br>
-                    ${escapeHtml(video.snippet.description || '')}
-                </div>
-            `;
+// ====== small keyboard cheat: "r" to reopen modals for testing =====
+document.addEventListener('keydown',(e)=>{
+  if (e.key === 'r') { showModal(consentModal); }
+});
 
-            videoModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeVideoPlayer() {
-            videoModal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-            videoPlayer.innerHTML = '';
-        }
-
-        // Close modal clicking outside
-        videoModal.addEventListener('click', function(e){
-            if (e.target === videoModal) closeVideoPlayer();
-        });
-
-        // helpers
-        function formatViewCount(views) {
-            const count = parseInt(views || '0', 10);
-            if (isNaN(count)) return '0';
-            if (count >= 1000000) return (count/1000000).toFixed(1) + 'M';
-            if (count >= 1000) return (count/1000).toFixed(1) + 'K';
-            return count.toString();
-        }
-        function formatCount(count){ return formatViewCount(count); }
-
-        function formatTimeAgo(publishedAt) {
-            if (!publishedAt) return '';
-            const published = new Date(publishedAt);
-            const now = new Date();
-            const diffTime = Math.abs(now - published);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            if (diffDays < 30) return `${diffDays} днів тому`;
-            if (diffDays < 365) return `${Math.floor(diffDays/30)} місяців тому`;
-            return `${Math.floor(diffDays/365)} років тому`;
-        }
-
-        // simple html escape to avoid breaking markup with titles/descriptions
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-    </script>
+// Note: This is a prototype. For production:
+// - Не зберігайте секретні ключі у відкритому JS.
+// - Робіть бекенд-проксі для API-ключів, додайте автентифікацію та захист від витоку ключів.
+// - Паролі в localStorage — небезпечно.
+</script>
 </body>
 </html>
